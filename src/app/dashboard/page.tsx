@@ -5,7 +5,7 @@ import DashboardClient from "./DashboardClient";
 import RepostReminders from "@/components/RepostReminders";
 import RecentlyViewed from "@/components/RecentlyViewed";
 import Link from "next/link";
-import { Plus, BarChart3, Building2, BadgeCheck, CreditCard, Gift, Wrench, Briefcase, Home } from "lucide-react";
+import { Plus, BarChart3, Building2, BadgeCheck, CreditCard, Gift, Wrench, Briefcase, Home, Car, TrendingUp, Code } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
@@ -171,6 +171,42 @@ export default async function DashboardPage() {
           <div>
             <p className="text-sm font-medium text-gray-900">Property Hub</p>
             <p className="text-xs text-gray-500">Agent tools</p>
+          </div>
+        </Link>
+        <Link
+          href="/dashboard/vehicles"
+          className="flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-xl hover:border-sky-300 hover:bg-sky-50 transition"
+        >
+          <div className="w-10 h-10 bg-sky-100 rounded-lg flex items-center justify-center">
+            <Car className="w-5 h-5 text-sky-600" />
+          </div>
+          <div>
+            <p className="text-sm font-medium text-gray-900">Vehicles Hub</p>
+            <p className="text-xs text-gray-500">Dealer tools</p>
+          </div>
+        </Link>
+        <Link
+          href="/dashboard/insights"
+          className="flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-xl hover:border-emerald-300 hover:bg-emerald-50 transition"
+        >
+          <div className="w-10 h-10 bg-emerald-100 rounded-lg flex items-center justify-center">
+            <TrendingUp className="w-5 h-5 text-emerald-600" />
+          </div>
+          <div>
+            <p className="text-sm font-medium text-gray-900">Market Insights</p>
+            <p className="text-xs text-gray-500">Trends & data</p>
+          </div>
+        </Link>
+        <Link
+          href="/dashboard/api"
+          className="flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-xl hover:border-violet-300 hover:bg-violet-50 transition"
+        >
+          <div className="w-10 h-10 bg-violet-100 rounded-lg flex items-center justify-center">
+            <Code className="w-5 h-5 text-violet-600" />
+          </div>
+          <div>
+            <p className="text-sm font-medium text-gray-900">API Access</p>
+            <p className="text-xs text-gray-500">Developer tools</p>
           </div>
         </Link>
       </div>

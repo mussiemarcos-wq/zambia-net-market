@@ -237,3 +237,106 @@ export const PROPERTY_AGENT_PLANS = [
     features: ["Unlimited listings", "Agency branding page", "Multiple agent accounts", "Top of search", "Full analytics", "Verified agency badge", "API access"],
   },
 ];
+
+// Promoted / Sponsored Categories
+export const SPONSORED_CATEGORY_PLANS = [
+  {
+    id: "sponsor_category_7",
+    name: "Category Sponsor - 7 Days",
+    days: 7,
+    price: 500,
+    priceNgwee: 50000,
+    features: ["Logo on category page", "Branded category header", "All listings see your brand"],
+  },
+  {
+    id: "sponsor_category_30",
+    name: "Category Sponsor - 30 Days",
+    days: 30,
+    price: 1500,
+    priceNgwee: 150000,
+    features: ["Logo on category page", "Branded category header", "All listings see your brand", "Monthly analytics report"],
+  },
+  {
+    id: "sponsor_homepage",
+    name: "Homepage Sponsor - 30 Days",
+    days: 30,
+    price: 5000,
+    priceNgwee: 500000,
+    features: ["Logo on homepage", "Featured brand section", "Top visibility across all categories"],
+  },
+];
+
+// Auto-Dealer Packages
+export const AUTO_DEALER_PLANS = [
+  {
+    id: "dealer_starter",
+    name: "Starter",
+    price: 300,
+    priceNgwee: 30000,
+    features: ["15 vehicle listings", "Dealer profile page", "Contact tracking", "60-day listing expiry"],
+  },
+  {
+    id: "dealer_professional",
+    name: "Professional",
+    price: 800,
+    priceNgwee: 80000,
+    features: ["50 vehicle listings", "Featured dealer profile", "Lead notifications", "Priority in search", "Full analytics", "90-day expiry"],
+  },
+  {
+    id: "dealer_enterprise",
+    name: "Enterprise",
+    price: 2000,
+    priceNgwee: 200000,
+    features: ["Unlimited listings", "Branded dealership page", "Inventory management", "Top of search", "Full analytics", "API access", "Verified dealer badge"],
+  },
+];
+
+// Data & Insights Subscriptions
+export const DATA_INSIGHTS_PLANS = [
+  {
+    id: "insights_basic",
+    name: "Market Watch",
+    price: 200,
+    priceNgwee: 20000,
+    features: ["Weekly market trends report", "Category price averages", "Top searched items", "Basic demand data"],
+  },
+  {
+    id: "insights_professional",
+    name: "Business Intelligence",
+    price: 1000,
+    priceNgwee: 100000,
+    features: ["Daily market trends", "Price history & forecasts", "Demand heatmaps by location", "Competitor analysis", "Custom category reports", "Export to CSV"],
+  },
+  {
+    id: "insights_enterprise",
+    name: "Enterprise Data",
+    price: 5000,
+    priceNgwee: 500000,
+    features: ["Real-time market data", "Full API access", "Custom dashboards", "Predictive analytics", "Dedicated account manager", "White-label reports"],
+  },
+];
+
+// API Access Plans
+export const API_ACCESS_PLANS = [
+  {
+    id: "api_starter",
+    name: "Starter API",
+    price: 500,
+    priceNgwee: 50000,
+    features: ["1,000 API calls/month", "Read-only access", "Listing search & browse", "Category data"],
+  },
+  {
+    id: "api_business",
+    name: "Business API",
+    price: 2000,
+    priceNgwee: 200000,
+    features: ["10,000 API calls/month", "Read + Write access", "Bulk listing upload", "Inventory sync", "Webhook notifications"],
+  },
+  {
+    id: "api_enterprise",
+    name: "Enterprise API",
+    price: 10000,
+    priceNgwee: 1000000,
+    features: ["Unlimited API calls", "Full read/write access", "Real-time webhooks", "Dedicated support", "Custom endpoints", "SLA guarantee"],
+  },
+];

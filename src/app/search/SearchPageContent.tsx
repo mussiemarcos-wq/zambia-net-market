@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import ListingCard from "@/components/ListingCard";
 import SaveSearchButton from "@/components/SaveSearchButton";
+import CategorySponsor from "@/components/CategorySponsor";
 
 const MapView = dynamic(() => import("@/components/MapView"), { ssr: false });
 import {
@@ -444,6 +445,9 @@ export default function SearchPageContent() {
 
         {/* Main Content */}
         <div className="flex-1 min-w-0">
+          {/* Category Sponsor */}
+          {category && <CategorySponsor categorySlug={category} />}
+
           {/* Results header */}
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
