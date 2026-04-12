@@ -10,10 +10,10 @@ export default function AuthModal() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const [loginForm, setLoginForm] = useState({ phone: "", password: "" });
+  const [loginForm, setLoginForm] = useState({ phone: "+260", password: "" });
   const [registerForm, setRegisterForm] = useState({
     name: "",
-    phone: "",
+    phone: "+260",
     password: "",
     email: "",
     location: "",
@@ -116,7 +116,7 @@ export default function AuthModal() {
                 <input
                   type="tel"
                   required
-                  placeholder="+1234567890"
+                  placeholder="+260 9XX XXX XXX"
                   value={loginForm.phone}
                   onChange={(e) => setLoginForm({ ...loginForm, phone: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
@@ -163,7 +163,7 @@ export default function AuthModal() {
                 <input
                   type="tel"
                   required
-                  placeholder="+1234567890"
+                  placeholder="+260 9XX XXX XXX"
                   value={registerForm.phone}
                   onChange={(e) =>
                     setRegisterForm({ ...registerForm, phone: e.target.value })
