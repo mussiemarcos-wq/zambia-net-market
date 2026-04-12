@@ -35,12 +35,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     ? listing.description.length > 160
       ? listing.description.slice(0, 157) + "..."
       : listing.description
-    : `Check out ${listing.title} on Zambia.net Market`;
+    : `Check out ${listing.title} on Zambia.net Marketplace`;
 
   const images = listing.images.map((img) => img.url);
 
   return {
-    title: `${listing.title} | Zambia.net Market`,
+    title: `${listing.title} | Zambia.net Marketplace`,
     description,
     openGraph: {
       title: listing.title,

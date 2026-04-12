@@ -1,6 +1,6 @@
 {
-  "name": "Zambia.net Market",
-  "short_name": "Zambia.net Market",
+  "name": "Zambia.net Marketplace",
+  "short_name": "Zambia.net Marketplace",
   "description": "Your Local Marketplace",
   "start_url": "/",
   "display": "standalone",

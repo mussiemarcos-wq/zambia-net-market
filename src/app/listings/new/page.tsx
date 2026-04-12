@@ -173,7 +173,7 @@ export default function NewListingPage() {
             Sign in to post a listing
           </h1>
           <p className="text-gray-500 mb-6">
-            You need to be logged in to create a listing on Zambia.net Market.
+            You need to be logged in to create a listing on Zambia.net Marketplace.
           </p>
           <button
             onClick={() => openAuthModal("login")}

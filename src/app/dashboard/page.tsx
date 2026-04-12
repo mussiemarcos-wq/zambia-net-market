@@ -9,7 +9,7 @@ import { Plus, BarChart3, Building2, BadgeCheck, CreditCard } from "lucide-react
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "Dashboard - Zambia.net Market",
+  title: "Dashboard - Zambia.net Marketplace",
 };
 
 export default async function DashboardPage() {

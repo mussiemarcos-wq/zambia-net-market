@@ -46,7 +46,7 @@ export async function GET(req: NextRequest) {
     jobs: "\u{1F4BC}",
   };
 
-  let message = "\u{1F525} *Hot Listings This Week on Zambia.net Market* \u{1F525}\n\n";
+  let message = "\u{1F525} *Hot Listings This Week on Zambia.net Marketplace* \u{1F525}\n\n";
 
   listings.forEach((listing, index) => {
     const emoji = categoryEmoji[listing.category?.slug ?? ""] ?? "\u{1F4E6}";

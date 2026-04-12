@@ -8,7 +8,7 @@ import Link from "next/link";
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "Favourites - Zambia.net Market",
+  title: "Favourites - Zambia.net Marketplace",
 };
 
 export default async function FavouritesPage() {

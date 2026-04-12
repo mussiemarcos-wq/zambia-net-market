@@ -11,13 +11,13 @@ const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "http://localhost:7333"),
-  title: "Zambia.net Market - Your Local Marketplace",
+  title: "Zambia.net Marketplace - Your Local Marketplace",
   description:
     "Buy, sell, and connect with your community. Post listings for property, vehicles, jobs, services, electronics and more.",
   openGraph: {
-    siteName: "Zambia.net Market",
+    siteName: "Zambia.net Marketplace",
     type: "website",
-    title: "Zambia.net Market - Your Local Marketplace",
+    title: "Zambia.net Marketplace - Your Local Marketplace",
     description:
       "Buy, sell, and connect with your community. Post listings for property, vehicles, jobs, services, electronics and more.",
   },

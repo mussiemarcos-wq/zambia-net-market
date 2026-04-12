@@ -160,7 +160,7 @@ export default function EditListingPage() {
             Sign in to edit your listing
           </h1>
           <p className="text-gray-500 mb-6">
-            You need to be logged in to edit a listing on Zambia.net Market.
+            You need to be logged in to edit a listing on Zambia.net Marketplace.
           </p>
           <button
             onClick={() => openAuthModal("login")}

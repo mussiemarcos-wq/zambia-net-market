@@ -162,8 +162,8 @@ export async function initializePayment({
 }) {
   const amountZMW = amount / 100; // convert ngwee to ZMW
   const description = metadata?.type
-    ? `Zambia.net Market ${metadata.type} - ${metadata.planId || "payment"}`
-    : "Zambia.net Market Payment";
+    ? `Zambia.net Marketplace ${metadata.type} - ${metadata.planId || "payment"}`
+    : "Zambia.net Marketplace Payment";
 
   const result = await createToken({
     amount: amountZMW,

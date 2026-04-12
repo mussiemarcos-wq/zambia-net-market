@@ -96,7 +96,7 @@ export default function LocationPicker({
         `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
           query + ", Zambia"
         )}&limit=5&countrycodes=zm`,
-        { headers: { "User-Agent": "Zambia.net Market/1.0" } }
+        { headers: { "User-Agent": "Zambia.net Marketplace/1.0" } }
       );
       const data = await res.json();
       setSuggestions(data);
@@ -145,7 +145,7 @@ export default function LocationPicker({
 
     fetch(
       `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`,
-      { headers: { "User-Agent": "Zambia.net Market/1.0" } }
+      { headers: { "User-Agent": "Zambia.net Marketplace/1.0" } }
     )
       .then((r) => r.json())
       .then((data) => {

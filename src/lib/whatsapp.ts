@@ -86,7 +86,7 @@ export function buildSearchResponse(listings: ListingForWhatsApp[]): string {
 
 export function buildHelpMessage(): string {
   return [
-    `Welcome to Zambia.net Market Bot!\n`,
+    `Welcome to Zambia.net Marketplace Bot!\n`,
     `Here's how to use me:\n`,
     `*Search:* Just type what you're looking for`,
     `  Example: "iPhone 15"`,

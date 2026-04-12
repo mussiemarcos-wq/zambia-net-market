@@ -10,7 +10,7 @@ export default function Footer() {
               <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold text-sm">Z</span>
               </div>
-              <span className="text-lg font-bold text-white">Zambia.net Market</span>
+              <span className="text-lg font-bold text-white">Zambia.net Marketplace</span>
             </div>
             <p className="text-sm">
               Your local marketplace. Buy, sell, and connect with your community.
@@ -43,7 +43,7 @@ export default function Footer() {
           </div>
         </div>
         <div className="border-t border-gray-800 mt-8 pt-8 text-sm text-center">
-          &copy; {new Date().getFullYear()} Zambia.net Market. All rights reserved.
+          &copy; {new Date().getFullYear()} Zambia.net Marketplace. All rights reserved.
         </div>
       </div>
     </footer>

@@ -12,7 +12,7 @@ import {
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "Admin Panel - Zambia.net Market",
+  title: "Admin Panel - Zambia.net Marketplace",
 };
 
 export default async function AdminPage() {

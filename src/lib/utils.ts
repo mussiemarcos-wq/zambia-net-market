@@ -32,7 +32,7 @@ export function generateWhatsAppLink(
   const cleanPhone = phone.replace(/\D/g, "");
   const priceText = price ? ` - ${price}` : "";
   const message = encodeURIComponent(
-    `Hi, I'm interested in your listing: "${listingTitle}"${priceText} on Zambia.net Market`
+    `Hi, I'm interested in your listing: "${listingTitle}"${priceText} on Zambia.net Marketplace`
   );
   return `https://wa.me/${cleanPhone}?text=${message}`;
 }

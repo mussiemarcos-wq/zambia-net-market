@@ -91,7 +91,7 @@ export default function ListingActions({
   function handleShareWhatsApp() {
     const url = `${window.location.origin}/listings/${listingId}`;
     const text = encodeURIComponent(
-      `Check out this listing: "${listingTitle}" on Zambia.net Market\n${url}`
+      `Check out this listing: "${listingTitle}" on Zambia.net Marketplace\n${url}`
     );
     window.open(`https://wa.me/?text=${text}`, "_blank", "noopener,noreferrer");
     setShowShare(false);
@@ -228,7 +228,7 @@ export default function ListingActions({
                 </div>
                 <p className="text-gray-900 font-medium">Report submitted</p>
                 <p className="text-gray-500 text-sm mt-1">
-                  Thank you for helping keep Zambia.net Market safe.
+                  Thank you for helping keep Zambia.net Marketplace safe.
                 </p>
                 <button
                   onClick={() => {

@@ -1,4 +1,4 @@
-export const APP_NAME = "Zambia.net Market";
+export const APP_NAME = "Zambia.net Marketplace";
 
 export const CATEGORIES_WITH_SUBS = [
   {

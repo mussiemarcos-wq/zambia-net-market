@@ -46,7 +46,7 @@ export default function InstallPrompt() {
           <Download className="w-5 h-5 text-blue-600" />
         </div>
         <p className="text-sm text-gray-700 flex-1">
-          Install Zambia.net Market for a better experience
+          Install Zambia.net Marketplace for a better experience
         </p>
         <button
           onClick={handleInstall}
