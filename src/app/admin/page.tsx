@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import AdminClient from "./AdminClient";
+import ExportButton from "@/components/ExportButton";
 import {
   Users,
   Package,
@@ -99,11 +100,17 @@ export default async function AdminPage() {
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
       {/* Page Header */}
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Admin Panel</h1>
-        <p className="text-sm text-gray-500 mt-1">
-          Manage listings, users, and reports.
-        </p>
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Admin Panel</h1>
+          <p className="text-sm text-gray-500 mt-1">
+            Manage listings, users, and reports.
+          </p>
+        </div>
+        <div className="flex items-center gap-2">
+          <ExportButton type="listings" />
+          <ExportButton type="payments" />
+        </div>
       </div>
 
       {/* Stats Cards */}

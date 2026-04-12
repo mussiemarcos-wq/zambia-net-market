@@ -10,6 +10,7 @@ import {
   AlertTriangle,
   ExternalLink,
   Star,
+  Loader2,
 } from "lucide-react";
 import { cn, timeAgo } from "@/lib/utils";
 
@@ -71,6 +72,81 @@ export default function AdminClient({
   const [processingReport, setProcessingReport] = useState<string | null>(null);
   const [processingListing, setProcessingListing] = useState<string | null>(null);
   const [processingReview, setProcessingReview] = useState<string | null>(null);
+  const [selectedListings, setSelectedListings] = useState<Set<string>>(new Set());
+  const [bulkProcessing, setBulkProcessing] = useState(false);
+
+  const allSelected =
+    listings.length > 0 && selectedListings.size === listings.length;
+
+  function toggleSelectAll() {
+    if (allSelected) {
+      setSelectedListings(new Set());
+    } else {
+      setSelectedListings(new Set(listings.map((l) => l.id)));
+    }
+  }
+
+  function toggleSelectListing(id: string) {
+    setSelectedListings((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+  }
+
+  async function handleBulkAction(action: "remove" | "approve") {
+    const count = selectedListings.size;
+    const actionLabel =
+      action === "remove"
+        ? `remove ${count} selected listing${count !== 1 ? "s" : ""}`
+        : `approve ${count} selected listing${count !== 1 ? "s" : ""}`;
+
+    if (!confirm(`Are you sure you want to ${actionLabel}?`)) return;
+
+    setBulkProcessing(true);
+    try {
+      const ids = Array.from(selectedListings);
+      const results = await Promise.allSettled(
+        ids.map((id) => {
+          if (action === "remove") {
+            return fetch(`/api/listings/${id}`, { method: "DELETE" });
+          } else {
+            return fetch(`/api/listings/${id}`, {
+              method: "PUT",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ status: "ACTIVE" }),
+            });
+          }
+        })
+      );
+
+      const succeededIds: string[] = [];
+      results.forEach((result, index) => {
+        if (result.status === "fulfilled" && result.value.ok) {
+          succeededIds.push(ids[index]);
+        }
+      });
+
+      if (action === "remove") {
+        setListings((prev) =>
+          prev.filter((l) => !succeededIds.includes(l.id))
+        );
+      } else {
+        setListings((prev) =>
+          prev.map((l) =>
+            succeededIds.includes(l.id) ? { ...l, status: "ACTIVE" } : l
+          )
+        );
+      }
+      setSelectedListings(new Set());
+    } finally {
+      setBulkProcessing(false);
+    }
+  }
 
   async function handleReportAction(
     reportId: string,
@@ -291,6 +367,47 @@ export default function AdminClient({
           <h2 className="font-semibold text-gray-900">Recent Listings</h2>
         </div>
 
+        {/* Bulk Action Bar */}
+        {selectedListings.size > 0 && (
+          <div className="flex items-center gap-3 px-4 py-3 bg-blue-50 border-b border-blue-100">
+            <span className="text-sm font-medium text-blue-700">
+              {selectedListings.size} selected
+            </span>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => handleBulkAction("remove")}
+                disabled={bulkProcessing}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-red-600 text-white text-xs font-medium rounded-lg hover:bg-red-700 transition disabled:opacity-50"
+              >
+                {bulkProcessing ? (
+                  <Loader2 className="w-3 h-3 animate-spin" />
+                ) : (
+                  <Trash2 className="w-3 h-3" />
+                )}
+                Remove Selected
+              </button>
+              <button
+                onClick={() => handleBulkAction("approve")}
+                disabled={bulkProcessing}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-green-600 text-white text-xs font-medium rounded-lg hover:bg-green-700 transition disabled:opacity-50"
+              >
+                {bulkProcessing ? (
+                  <Loader2 className="w-3 h-3 animate-spin" />
+                ) : (
+                  <CheckCircle className="w-3 h-3" />
+                )}
+                Approve Selected
+              </button>
+            </div>
+            <button
+              onClick={() => setSelectedListings(new Set())}
+              className="ml-auto text-xs text-blue-600 hover:text-blue-800 font-medium"
+            >
+              Clear selection
+            </button>
+          </div>
+        )}
+
         {listings.length === 0 ? (
           <div className="py-12 text-center text-gray-500">
             <p className="text-sm">No listings found.</p>
@@ -300,6 +417,14 @@ export default function AdminClient({
             <table className="w-full text-sm">
               <thead>
                 <tr className="bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wide">
+                  <th className="px-4 py-3 w-10">
+                    <input
+                      type="checkbox"
+                      checked={allSelected}
+                      onChange={toggleSelectAll}
+                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    />
+                  </th>
                   <th className="px-4 py-3">Title</th>
                   <th className="px-4 py-3">Seller</th>
                   <th className="px-4 py-3">Category</th>
@@ -311,14 +436,24 @@ export default function AdminClient({
               <tbody className="divide-y divide-gray-100">
                 {listings.map((listing) => {
                   const isProcessing = processingListing === listing.id;
+                  const isSelected = selectedListings.has(listing.id);
                   return (
                     <tr
                       key={listing.id}
                       className={cn(
                         "hover:bg-gray-50/50 transition",
-                        isProcessing && "opacity-50 pointer-events-none"
+                        isProcessing && "opacity-50 pointer-events-none",
+                        isSelected && "bg-blue-50/50"
                       )}
                     >
+                      <td className="px-4 py-3">
+                        <input
+                          type="checkbox"
+                          checked={isSelected}
+                          onChange={() => toggleSelectListing(listing.id)}
+                          className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                        />
+                      </td>
                       <td className="px-4 py-3">
                         <Link
                           href={`/listings/${listing.id}`}

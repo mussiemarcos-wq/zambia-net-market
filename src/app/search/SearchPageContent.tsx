@@ -1,7 +1,7 @@
 "use client";
 
 import { useSearchParams, useRouter } from "next/navigation";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import dynamic from "next/dynamic";
 import {
   Search,
@@ -12,6 +12,8 @@ import {
   PackageOpen,
   LayoutGrid,
   Map,
+  ArrowUp,
+  Loader2,
 } from "lucide-react";
 import ListingCard from "@/components/ListingCard";
 import SaveSearchButton from "@/components/SaveSearchButton";
@@ -75,8 +77,12 @@ export default function SearchPageContent() {
   const [total, setTotal] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [viewMode, setViewMode] = useState<"grid" | "map">("grid");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [showBackToTop, setShowBackToTop] = useState(false);
+  const sentinelRef = useRef<HTMLDivElement>(null);
 
   // Read filters from URL
   const q = searchParams.get("q") || "";
@@ -86,7 +92,6 @@ export default function SearchPageContent() {
   const maxPrice = searchParams.get("maxPrice") || "";
   const condition = searchParams.get("condition") || "";
   const sort = searchParams.get("sort") || "newest";
-  const page = parseInt(searchParams.get("page") || "1", 10);
 
   // Local filter state for inputs (committed on apply)
   const [searchText, setSearchText] = useState(q);
@@ -123,15 +128,29 @@ export default function SearchPageContent() {
     [searchParams, router]
   );
 
+  // Reset listings when filters change
+  useEffect(() => {
+    setListings([]);
+    setCurrentPage(1);
+    setTotalPages(0);
+    setTotal(0);
+  }, [q, category, subcategory, minPrice, maxPrice, condition, sort]);
+
   // Fetch listings
   useEffect(() => {
     const controller = new AbortController();
 
     async function fetchListings() {
-      setLoading(true);
+      const isFirstPage = currentPage === 1;
+      if (isFirstPage) {
+        setLoading(true);
+      } else {
+        setLoadingMore(true);
+      }
+
       try {
         const params = new URLSearchParams();
-        params.set("page", String(page));
+        params.set("page", String(currentPage));
         params.set("limit", "20");
         if (q) params.set("search", q);
         if (category) params.set("category", category);
@@ -146,7 +165,12 @@ export default function SearchPageContent() {
         });
         if (!res.ok) throw new Error("Failed to fetch");
         const data: ApiResponse = await res.json();
-        setListings(data.listings);
+
+        if (isFirstPage) {
+          setListings(data.listings);
+        } else {
+          setListings((prev) => [...prev, ...data.listings]);
+        }
         setTotal(data.total);
         setTotalPages(data.totalPages);
       } catch (err: unknown) {
@@ -154,12 +178,49 @@ export default function SearchPageContent() {
         console.error("Error fetching listings:", err);
       } finally {
         setLoading(false);
+        setLoadingMore(false);
       }
     }
 
     fetchListings();
     return () => controller.abort();
-  }, [q, category, subcategory, minPrice, maxPrice, condition, sort, page]);
+  }, [q, category, subcategory, minPrice, maxPrice, condition, sort, currentPage]);
+
+  // IntersectionObserver for infinite scroll
+  useEffect(() => {
+    const sentinel = sentinelRef.current;
+    if (!sentinel) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (
+          entries[0].isIntersecting &&
+          !loading &&
+          !loadingMore &&
+          currentPage < totalPages
+        ) {
+          setCurrentPage((prev) => prev + 1);
+        }
+      },
+      { rootMargin: "200px" }
+    );
+
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [loading, loadingMore, currentPage, totalPages]);
+
+  // Show/hide back to top button
+  useEffect(() => {
+    function handleScroll() {
+      setShowBackToTop(window.scrollY > 800);
+    }
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  function scrollToTop() {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
 
   function handleSearchSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -560,54 +621,36 @@ export default function SearchPageContent() {
             </div>
           )}
 
-          {/* Pagination */}
-          {!loading && totalPages > 1 && (
-            <div className="flex items-center justify-center gap-2 mt-8">
-              <button
-                onClick={() =>
-                  updateFilters({ page: String(Math.max(1, page - 1)) })
-                }
-                disabled={page <= 1}
-                className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-50 transition"
-              >
-                Previous
-              </button>
+          {/* Infinite scroll sentinel */}
+          <div ref={sentinelRef} className="h-1" />
 
-              {generatePageNumbers(page, totalPages).map((p, i) =>
-                p === "..." ? (
-                  <span key={`ellipsis-${i}`} className="px-2 text-gray-400">
-                    ...
-                  </span>
-                ) : (
-                  <button
-                    key={p}
-                    onClick={() => updateFilters({ page: String(p) })}
-                    className={`w-10 h-10 rounded-lg text-sm font-medium transition ${
-                      p === page
-                        ? "bg-blue-600 text-white"
-                        : "border border-gray-300 hover:bg-gray-50"
-                    }`}
-                  >
-                    {p}
-                  </button>
-                )
-              )}
-
-              <button
-                onClick={() =>
-                  updateFilters({
-                    page: String(Math.min(totalPages, page + 1)),
-                  })
-                }
-                disabled={page >= totalPages}
-                className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium disabled:opacity-40 disabled:cursor-not-allowed hover:bg-gray-50 transition"
-              >
-                Next
-              </button>
+          {/* Loading more spinner */}
+          {loadingMore && (
+            <div className="flex items-center justify-center py-8">
+              <Loader2 className="w-6 h-6 animate-spin text-blue-600 mr-2" />
+              <span className="text-sm text-gray-500">Loading more listings...</span>
             </div>
+          )}
+
+          {/* End of results */}
+          {!loading && !loadingMore && listings.length > 0 && currentPage >= totalPages && (
+            <p className="text-center text-sm text-gray-400 py-8">
+              All {total} listings loaded.
+            </p>
           )}
         </div>
       </div>
+
+      {/* Back to top button */}
+      {showBackToTop && (
+        <button
+          onClick={scrollToTop}
+          className="fixed bottom-6 right-6 z-40 p-3 bg-blue-600 text-white rounded-full shadow-lg hover:bg-blue-700 transition"
+          title="Back to top"
+        >
+          <ArrowUp className="w-5 h-5" />
+        </button>
+      )}
     </div>
   );
 }
@@ -632,21 +675,3 @@ function FilterTag({
   );
 }
 
-function generatePageNumbers(
-  current: number,
-  total: number
-): (number | "...")[] {
-  if (total <= 7) {
-    return Array.from({ length: total }, (_, i) => i + 1);
-  }
-  const pages: (number | "...")[] = [1];
-  if (current > 3) pages.push("...");
-  const start = Math.max(2, current - 1);
-  const end = Math.min(total - 1, current + 1);
-  for (let i = start; i <= end; i++) {
-    pages.push(i);
-  }
-  if (current < total - 2) pages.push("...");
-  pages.push(total);
-  return pages;
-}

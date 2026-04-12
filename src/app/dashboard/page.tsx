@@ -5,7 +5,7 @@ import DashboardClient from "./DashboardClient";
 import RepostReminders from "@/components/RepostReminders";
 import RecentlyViewed from "@/components/RecentlyViewed";
 import Link from "next/link";
-import { Plus, BarChart3, Building2, BadgeCheck, CreditCard, Gift, Wrench, Briefcase, Home, Car, TrendingUp, Code } from "lucide-react";
+import { Plus, BarChart3, Building2, BadgeCheck, CreditCard, Gift, Wrench, Briefcase, Home, Car, TrendingUp, Code, User } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
@@ -87,6 +87,18 @@ export default async function DashboardPage() {
           <div>
             <p className="text-sm font-medium text-gray-900">Analytics</p>
             <p className="text-xs text-gray-500">Views & clicks</p>
+          </div>
+        </Link>
+        <Link
+          href="/dashboard/profile"
+          className="flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-xl hover:border-cyan-300 hover:bg-cyan-50 transition"
+        >
+          <div className="w-10 h-10 bg-cyan-100 rounded-lg flex items-center justify-center">
+            <User className="w-5 h-5 text-cyan-600" />
+          </div>
+          <div>
+            <p className="text-sm font-medium text-gray-900">My Profile</p>
+            <p className="text-xs text-gray-500">Edit details</p>
           </div>
         </Link>
         <Link

@@ -2,7 +2,7 @@ import Link from "next/link";
 
 export default function Footer() {
   return (
-    <footer className="bg-gray-900 text-gray-400 mt-16">
+    <footer className="bg-gray-900 dark:bg-gray-950 text-gray-400 mt-16">
       <div className="max-w-7xl mx-auto px-4 py-12">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
           <div>
@@ -42,7 +42,7 @@ export default function Footer() {
             </ul>
           </div>
         </div>
-        <div className="border-t border-gray-800 mt-8 pt-8 text-sm text-center">
+        <div className="border-t border-gray-800 dark:border-gray-700 mt-8 pt-8 text-sm text-center">
           &copy; {new Date().getFullYear()} Zambia.net Marketplace. All rights reserved.
         </div>
       </div>

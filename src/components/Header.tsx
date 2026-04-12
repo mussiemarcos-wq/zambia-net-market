@@ -15,6 +15,7 @@ import {
   Shield,
 } from "lucide-react";
 import NotificationBell from "@/components/NotificationBell";
+import ThemeToggle from "@/components/ThemeToggle";
 
 export default function Header() {
   const { user, setUser, openAuthModal } = useAppStore();
@@ -58,7 +59,7 @@ export default function Header() {
   }
 
   return (
-    <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
+    <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
@@ -66,7 +67,7 @@ export default function Header() {
             <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-sm">Z</span>
             </div>
-            <span className="text-xl font-bold text-gray-900 hidden sm:block">
+            <span className="text-xl font-bold text-gray-900 dark:text-gray-100 hidden sm:block">
               Zambia.net Marketplace
             </span>
           </Link>
@@ -83,7 +84,7 @@ export default function Header() {
                 placeholder="Search listings..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm bg-white dark:bg-gray-700 dark:text-gray-100"
               />
             </div>
           </form>
@@ -101,17 +102,18 @@ export default function Header() {
                 </Link>
                 <Link
                   href="/favourites"
-                  className="p-2 text-gray-600 hover:text-blue-600 transition"
+                  className="p-2 text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition"
                 >
                   <Heart className="w-5 h-5" />
                 </Link>
                 <NotificationBell />
+                <ThemeToggle />
                 <div className="relative" ref={userMenuRef}>
                   <button
                     onClick={() => setUserMenuOpen(!userMenuOpen)}
                     className="flex items-center gap-2 p-2 text-gray-600 hover:text-blue-600 transition"
                   >
-                    <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
+                    <div className="w-8 h-8 bg-gray-200 dark:bg-gray-600 rounded-full flex items-center justify-center">
                       {user.avatarUrl ? (
                         <img
                           src={user.avatarUrl}
@@ -119,21 +121,21 @@ export default function Header() {
                           className="w-8 h-8 rounded-full object-cover"
                         />
                       ) : (
-                        <User className="w-4 h-4 text-gray-500" />
+                        <User className="w-4 h-4 text-gray-500 dark:text-gray-300" />
                       )}
                     </div>
                   </button>
                   {userMenuOpen && (
-                    <div className="absolute right-0 mt-1 w-56 bg-white rounded-lg shadow-lg border border-gray-200 py-1">
-                      <div className="px-4 py-2 border-b border-gray-100">
-                        <p className="text-sm font-medium text-gray-900">
+                    <div className="absolute right-0 mt-1 w-56 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-1">
+                      <div className="px-4 py-2 border-b border-gray-100 dark:border-gray-700">
+                        <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
                           {user.name}
                         </p>
-                        <p className="text-xs text-gray-500">{user.phone}</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">{user.phone}</p>
                       </div>
                       <Link
                         href="/dashboard"
-                        className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                        className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
                         onClick={() => setUserMenuOpen(false)}
                       >
                         <LayoutDashboard className="w-4 h-4" />
@@ -141,7 +143,7 @@ export default function Header() {
                       </Link>
                       <Link
                         href="/favourites"
-                        className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                        className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
                         onClick={() => setUserMenuOpen(false)}
                       >
                         <Heart className="w-4 h-4" />
@@ -151,7 +153,7 @@ export default function Header() {
                         user.role === "SUPER_ADMIN") && (
                         <Link
                           href="/admin"
-                          className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                          className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
                           onClick={() => setUserMenuOpen(false)}
                         >
                           <Shield className="w-4 h-4" />
@@ -160,7 +162,7 @@ export default function Header() {
                       )}
                       <button
                         onClick={handleLogout}
-                        className="flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-gray-50 w-full"
+                        className="flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-gray-50 dark:hover:bg-gray-700 w-full"
                       >
                         <LogOut className="w-4 h-4" />
                         Logout
@@ -171,9 +173,10 @@ export default function Header() {
               </>
             ) : (
               <>
+                <ThemeToggle />
                 <button
                   onClick={() => openAuthModal("login")}
-                  className="text-sm text-gray-600 hover:text-blue-600 font-medium transition"
+                  className="text-sm text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 font-medium transition"
                 >
                   Log in
                 </button>
@@ -190,7 +193,7 @@ export default function Header() {
 
           {/* Mobile menu button */}
           <button
-            className="md:hidden p-2 text-gray-600"
+            className="md:hidden p-2 text-gray-600 dark:text-gray-300"
             onClick={() => setMenuOpen(!menuOpen)}
           >
             {menuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -206,7 +209,7 @@ export default function Header() {
               placeholder="Search listings..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm bg-white dark:bg-gray-700 dark:text-gray-100"
             />
           </div>
         </form>
@@ -214,13 +217,13 @@ export default function Header() {
 
       {/* Mobile menu */}
       {menuOpen && (
-        <div className="md:hidden border-t border-gray-200 bg-white">
+        <div className="md:hidden border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
           <div className="px-4 py-3 space-y-2">
             {user ? (
               <>
-                <div className="pb-2 border-b border-gray-100">
-                  <p className="font-medium text-gray-900">{user.name}</p>
-                  <p className="text-sm text-gray-500">{user.phone}</p>
+                <div className="pb-2 border-b border-gray-100 dark:border-gray-700">
+                  <p className="font-medium text-gray-900 dark:text-gray-100">{user.name}</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">{user.phone}</p>
                 </div>
                 <Link
                   href="/listings/new"
@@ -231,14 +234,14 @@ export default function Header() {
                 </Link>
                 <Link
                   href="/dashboard"
-                  className="block py-2 text-gray-700"
+                  className="block py-2 text-gray-700 dark:text-gray-300"
                   onClick={() => setMenuOpen(false)}
                 >
                   Dashboard
                 </Link>
                 <Link
                   href="/favourites"
-                  className="block py-2 text-gray-700"
+                  className="block py-2 text-gray-700 dark:text-gray-300"
                   onClick={() => setMenuOpen(false)}
                 >
                   Saved Listings
@@ -246,10 +249,14 @@ export default function Header() {
                 <div className="py-2">
                   <NotificationBell />
                 </div>
+                <div className="py-2 flex items-center gap-2 text-gray-700 dark:text-gray-300">
+                  <ThemeToggle />
+                  <span className="text-sm">Theme</span>
+                </div>
                 {(user.role === "ADMIN" || user.role === "SUPER_ADMIN") && (
                   <Link
                     href="/admin"
-                    className="block py-2 text-gray-700"
+                    className="block py-2 text-gray-700 dark:text-gray-300"
                     onClick={() => setMenuOpen(false)}
                   >
                     Admin Panel
@@ -267,12 +274,16 @@ export default function Header() {
               </>
             ) : (
               <>
+                <div className="py-2 flex items-center gap-2 text-gray-700 dark:text-gray-300">
+                  <ThemeToggle />
+                  <span className="text-sm">Theme</span>
+                </div>
                 <button
                   onClick={() => {
                     openAuthModal("login");
                     setMenuOpen(false);
                   }}
-                  className="block py-2 text-gray-700 w-full text-left"
+                  className="block py-2 text-gray-700 dark:text-gray-300 w-full text-left"
                 >
                   Log in
                 </button>
