@@ -14,6 +14,7 @@ import {
   Map,
 } from "lucide-react";
 import ListingCard from "@/components/ListingCard";
+import SaveSearchButton from "@/components/SaveSearchButton";
 
 const MapView = dynamic(() => import("@/components/MapView"), { ssr: false });
 import {
@@ -445,11 +446,19 @@ export default function SearchPageContent() {
         <div className="flex-1 min-w-0">
           {/* Results header */}
           <div className="flex items-center justify-between mb-4">
-            <p className="text-sm text-gray-500">
-              {loading
-                ? "Searching..."
-                : `${total} listing${total !== 1 ? "s" : ""} found`}
-            </p>
+            <div className="flex items-center gap-3">
+              <p className="text-sm text-gray-500">
+                {loading
+                  ? "Searching..."
+                  : `${total} listing${total !== 1 ? "s" : ""} found`}
+              </p>
+              <SaveSearchButton
+                query={q}
+                category={category}
+                minPrice={minPrice}
+                maxPrice={maxPrice}
+              />
+            </div>
             <div className="flex items-center gap-2">
               <div className="flex border border-gray-300 rounded-lg overflow-hidden">
                 <button

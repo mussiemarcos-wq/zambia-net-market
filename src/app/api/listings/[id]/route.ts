@@ -80,7 +80,7 @@ export async function PUT(
 
     const listing = await prisma.listing.findUnique({
       where: { id },
-      select: { userId: true },
+      select: { userId: true, price: true, title: true },
     });
 
     if (!listing) return notFound("Listing not found");
@@ -114,6 +114,8 @@ export async function PUT(
       }
     }
 
+    const oldPrice = listing.price ? Number(listing.price) : null;
+
     const updated = await prisma.listing.update({
       where: { id },
       data,
@@ -123,6 +125,38 @@ export async function PUT(
         subcategory: { select: { id: true, name: true, slug: true } },
       },
     });
+
+    // Price drop notification: if price was lowered, notify all users who favourited this listing
+    if (
+      body.price != null &&
+      oldPrice != null &&
+      Number(body.price) < oldPrice
+    ) {
+      const newPrice = Number(body.price);
+      const formatK = (n: number) =>
+        "K" + new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 }).format(n);
+
+      const favourites = await prisma.favourite.findMany({
+        where: { listingId: id },
+        select: { userId: true },
+      });
+
+      if (favourites.length > 0) {
+        await prisma.notification.createMany({
+          data: favourites.map((fav) => ({
+            userId: fav.userId,
+            type: "PRICE_DROP",
+            title: "Price Drop!",
+            body: `'${listing.title}' dropped from ${formatK(oldPrice)} to ${formatK(newPrice)}`,
+            data: {
+              listingId: id,
+              oldPrice: oldPrice,
+              newPrice: newPrice,
+            },
+          })),
+        });
+      }
+    }
 
     return success(updated);
   } catch (err) {

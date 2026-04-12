@@ -4,6 +4,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { success, error, unauthorized } from "@/lib/api";
 import { LISTING_LIMITS } from "@/lib/constants";
 import { ListingStatus, Prisma } from "@prisma/client";
+import { detectScamSignals } from "@/lib/scam-detector";
 
 export async function GET(request: NextRequest) {
   try {
@@ -185,6 +186,20 @@ export async function POST(request: NextRequest) {
     const expiresAt = new Date();
     expiresAt.setDate(expiresAt.getDate() + expiryDays);
 
+    // Run scam detection before creating the listing
+    const scamResult = await detectScamSignals(
+      {
+        title,
+        description: description || null,
+        price: price != null ? new Prisma.Decimal(price) : null,
+        categoryId,
+      },
+      prisma
+    );
+
+    // Determine listing status based on scam score
+    const listingStatus = scamResult.score > 60 ? "DRAFT" as const : "ACTIVE" as const;
+
     const listing = await prisma.listing.create({
       data: {
         userId: user.id,
@@ -198,7 +213,7 @@ export async function POST(request: NextRequest) {
         location: location || null,
         latitude: latitude != null ? new Prisma.Decimal(latitude) : null,
         longitude: longitude != null ? new Prisma.Decimal(longitude) : null,
-        status: ListingStatus.ACTIVE,
+        status: listingStatus,
         expiresAt,
       },
       include: {
@@ -208,7 +223,21 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    return success(listing, 201);
+    return success(
+      {
+        ...listing,
+        _meta: {
+          scamScore: scamResult.score,
+          scamWarnings: scamResult.warnings,
+          flaggedForReview: scamResult.score > 30,
+          statusOverride:
+            scamResult.score > 60
+              ? "Listing saved as draft due to high risk signals. Please review and edit before publishing."
+              : null,
+        },
+      },
+      201
+    );
   } catch (err) {
     console.error("POST /api/listings error:", err);
     return error("Failed to create listing", 500);

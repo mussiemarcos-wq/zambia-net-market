@@ -12,10 +12,12 @@ import {
   Filter,
   Zap,
   Star,
+  BarChart3,
 } from "lucide-react";
 import { formatPrice, timeAgo, cn } from "@/lib/utils";
 import BoostModal from "@/components/BoostModal";
 import BuyerIntentBadge from "@/components/BuyerIntentBadge";
+import CompetitorInsights from "@/components/CompetitorInsights";
 
 type ListingStatus = "DRAFT" | "ACTIVE" | "EXPIRED" | "SOLD" | "REMOVED";
 
@@ -77,6 +79,7 @@ export default function DashboardClient({
     mode: "boost" | "feature";
   }>({ isOpen: false, listingId: "", listingTitle: "", mode: "boost" });
   const [buyerIntentMap, setBuyerIntentMap] = useState<Record<string, number>>({});
+  const [insightsOpen, setInsightsOpen] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     fetch("/api/analytics/buyer-intent")
@@ -373,7 +376,34 @@ export default function DashboardClient({
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
+                    {listing.status === "ACTIVE" && (
+                      <button
+                        onClick={() =>
+                          setInsightsOpen((prev) => ({
+                            ...prev,
+                            [listing.id]: !prev[listing.id],
+                          }))
+                        }
+                        className={cn(
+                          "inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-lg transition",
+                          insightsOpen[listing.id]
+                            ? "bg-blue-100 text-blue-700"
+                            : "text-gray-500 hover:text-blue-600 hover:bg-blue-50"
+                        )}
+                        title="Competitor Insights"
+                      >
+                        <BarChart3 className="w-3.5 h-3.5" />
+                        Insights
+                      </button>
+                    )}
                   </div>
+
+                  {/* Competitor Insights Expansion */}
+                  {listing.status === "ACTIVE" && insightsOpen[listing.id] && (
+                    <div className="md:col-span-5">
+                      <CompetitorInsights listingId={listing.id} />
+                    </div>
+                  )}
                 </div>
               );
             })}

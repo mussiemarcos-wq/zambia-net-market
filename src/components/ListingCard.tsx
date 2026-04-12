@@ -1,10 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { Heart, MapPin, Clock, BadgeCheck, Zap } from "lucide-react";
-import { formatPrice, timeAgo } from "@/lib/utils";
+import { Heart, MapPin, BadgeCheck, Zap } from "lucide-react";
+import { formatPrice } from "@/lib/utils";
 import { useState } from "react";
 import { useAppStore } from "@/lib/store";
+import DealScoreBadge from "@/components/DealScoreBadge";
+import FreshnessIndicator from "@/components/FreshnessIndicator";
 
 interface ListingCardProps {
   listing: {
@@ -28,11 +30,13 @@ interface ListingCardProps {
     category: { name: string };
   };
   isFavourited?: boolean;
+  dealScore?: { score: string | null; percentage: number } | null;
 }
 
 export default function ListingCard({
   listing,
   isFavourited: initialFav = false,
+  dealScore,
 }: ListingCardProps) {
   const [isFav, setIsFav] = useState(initialFav);
   const { user, openAuthModal } = useAppStore();
@@ -120,6 +124,16 @@ export default function ListingCard({
             )}
           </p>
 
+          {dealScore && dealScore.score && (
+            <div className="mt-1">
+              <DealScoreBadge
+                score={dealScore.score}
+                percentage={dealScore.percentage}
+                compact
+              />
+            </div>
+          )}
+
           <div className="flex items-center gap-3 mt-2 text-xs text-gray-500">
             {listing.location && (
               <span className="flex items-center gap-0.5">
@@ -127,10 +141,7 @@ export default function ListingCard({
                 {listing.location}
               </span>
             )}
-            <span className="flex items-center gap-0.5">
-              <Clock className="w-3 h-3" />
-              {timeAgo(listing.createdAt)}
-            </span>
+            <FreshnessIndicator createdAt={listing.createdAt} />
           </div>
 
           <div className="flex items-center gap-1.5 mt-2 pt-2 border-t border-gray-100">

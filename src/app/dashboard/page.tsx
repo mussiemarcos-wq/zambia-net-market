@@ -3,6 +3,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import DashboardClient from "./DashboardClient";
 import RepostReminders from "@/components/RepostReminders";
+import RecentlyViewed from "@/components/RecentlyViewed";
 import Link from "next/link";
 import { Plus, BarChart3, Building2, BadgeCheck, CreditCard } from "lucide-react";
 
@@ -127,6 +128,7 @@ export default async function DashboardPage() {
       </div>
 
       <RepostReminders />
+      <RecentlyViewed />
       <DashboardClient listings={serialized} stats={stats} />
     </div>
   );

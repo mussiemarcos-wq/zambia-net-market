@@ -2,13 +2,22 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { MapPin, BadgeCheck, Clock, Eye, ChevronRight, Star } from "lucide-react";
 import { prisma } from "@/lib/db";
+import { getCurrentUser } from "@/lib/auth";
 import { formatPrice, timeAgo } from "@/lib/utils";
 import { CONDITION_LABELS, PRICE_TYPE_LABELS } from "@/lib/constants";
 import { ListingStatus, Prisma } from "@prisma/client";
 import { generateListingJsonLd } from "@/lib/seo";
+import { detectScamSignals } from "@/lib/scam-detector";
+import { calculateQualityScore } from "@/lib/listing-quality";
+import { calculateResponseRate } from "@/lib/response-rate";
+import { calculateDealScore } from "@/lib/deal-score";
 import ListingActions from "./ListingActions";
 import ListingLocationMap from "./ListingLocationMap";
 import SocialProof from "@/components/SocialProof";
+import ScamWarning from "@/components/ScamWarning";
+import QualityScore from "@/components/QualityScore";
+import ResponseRate from "@/components/ResponseRate";
+import DealScoreBadge from "@/components/DealScoreBadge";
 import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
@@ -106,6 +115,46 @@ export default async function ListingDetailPage({ params }: PageProps) {
     : 0;
   const sellerReviewCount = sellerReviewAgg._count.rating;
 
+  // Trust & Safety: compute scores in parallel
+  const currentUser = await getCurrentUser().catch(() => null);
+
+  const [scamResult, qualityResult, responseRateResult, dealScoreResult] =
+    await Promise.all([
+      detectScamSignals(
+        {
+          title: listing.title,
+          description: listing.description,
+          price: listing.price,
+          categoryId: listing.categoryId,
+        },
+        prisma
+      ),
+      Promise.resolve(
+        calculateQualityScore({
+          title: listing.title,
+          description: listing.description,
+          price: listing.price,
+          priceType: listing.priceType,
+          location: listing.location,
+          condition: listing.condition,
+          categoryId: listing.categoryId,
+          subcategoryId: listing.subcategoryId,
+          images: listing.images,
+        })
+      ),
+      calculateResponseRate(listing.user.id),
+      calculateDealScore(
+        {
+          price: listing.price,
+          priceType: listing.priceType,
+          categoryId: listing.categoryId,
+        },
+        prisma
+      ),
+    ]);
+
+  const isOwner = currentUser?.id === listing.user.id;
+
   // Fetch similar listings with improved relevance
   const similarWhere: Prisma.ListingWhereInput = {
     categoryId: listing.categoryId,
@@ -201,6 +250,14 @@ export default async function ListingDetailPage({ params }: PageProps) {
           )}
         </nav>
 
+        {/* Scam warning banner */}
+        {scamResult.warnings.length > 0 && (
+          <ScamWarning
+            warnings={scamResult.warnings}
+            isHighRisk={scamResult.isHighRisk}
+          />
+        )}
+
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Left column: images + details */}
           <div className="lg:col-span-2 space-y-6">
@@ -230,6 +287,14 @@ export default async function ListingDetailPage({ params }: PageProps) {
                       </span>
                     )}
                   </p>
+                  {dealScoreResult.score && (
+                    <div className="mt-2">
+                      <DealScoreBadge
+                        score={dealScoreResult.score}
+                        percentage={dealScoreResult.percentage}
+                      />
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -302,6 +367,15 @@ export default async function ListingDetailPage({ params }: PageProps) {
               />
             </div>
 
+            {/* Quality score - visible only to listing owner */}
+            {isOwner && (
+              <QualityScore
+                score={qualityResult.score}
+                grade={qualityResult.grade}
+                tips={qualityResult.tips}
+              />
+            )}
+
             {/* Seller info */}
             <div className="bg-white rounded-xl border border-gray-200 p-5">
               <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">
@@ -353,6 +427,10 @@ export default async function ListingDetailPage({ params }: PageProps) {
                   </span>
                 </div>
               )}
+              <ResponseRate
+                rate={responseRateResult.rate}
+                label={responseRateResult.label}
+              />
               {listing.user.location && (
                 <p className="flex items-center gap-1 text-sm text-gray-500 mt-3">
                   <MapPin className="w-3.5 h-3.5" />

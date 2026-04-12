@@ -3,6 +3,9 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { BarChart3, Eye, MessageCircle, Heart, ArrowLeft } from "lucide-react";
+import ConversionFunnel from "@/components/ConversionFunnel";
+import BestTimeToPost from "@/components/BestTimeToPost";
+import CategoryHealth from "@/components/CategoryHealth";
 
 interface ListingStat {
   id: string;
@@ -187,6 +190,15 @@ export default function AnalyticsPage() {
           </div>
         </div>
       )}
+
+      {/* Seller Intelligence Sections */}
+      <div className="mt-8">
+        <ConversionFunnel />
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+        <BestTimeToPost />
+        <CategoryHealth />
+      </div>
     </div>
   );
 }
