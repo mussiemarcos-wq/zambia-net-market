@@ -18,6 +18,7 @@ import ScamWarning from "@/components/ScamWarning";
 import QualityScore from "@/components/QualityScore";
 import ResponseRate from "@/components/ResponseRate";
 import DealScoreBadge from "@/components/DealScoreBadge";
+import AutoSharePrompt from "@/components/AutoSharePrompt";
 import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
@@ -46,7 +47,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       : listing.description
     : `Check out ${listing.title} on Zambia.net Marketplace`;
 
-  const images = listing.images.map((img) => img.url);
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://zambia.net";
+  const ogImage = `${appUrl}/api/og/${id}`;
 
   return {
     title: `${listing.title} | Zambia.net Marketplace`,
@@ -54,14 +56,21 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     openGraph: {
       title: listing.title,
       description,
-      images,
+      images: [
+        {
+          url: ogImage,
+          width: 1200,
+          height: 630,
+          alt: listing.title,
+        },
+      ],
       type: "website",
     },
     twitter: {
       card: "summary_large_image",
       title: listing.title,
       description,
-      images,
+      images: [ogImage],
     },
   };
 }
@@ -249,6 +258,15 @@ export default async function ListingDetailPage({ params }: PageProps) {
             </>
           )}
         </nav>
+
+        {/* Auto-share prompt for sellers */}
+        <AutoSharePrompt
+          listingId={listing.id}
+          listingTitle={listing.title}
+          listingUrl={`${process.env.NEXT_PUBLIC_APP_URL || ""}/listings/${listing.id}`}
+          createdAt={listing.createdAt.toISOString()}
+          sellerId={listing.user.id}
+        />
 
         {/* Scam warning banner */}
         {scamResult.warnings.length > 0 && (

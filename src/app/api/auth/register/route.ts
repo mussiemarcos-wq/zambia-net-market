@@ -3,11 +3,31 @@ import { cookies } from "next/headers";
 import { prisma } from "@/lib/db";
 import { hashPassword, signToken } from "@/lib/auth";
 import { success, error } from "@/lib/api";
+import { checkAndGrantRewards } from "@/lib/referral-rewards";
+
+function generateReferralCode(): string {
+  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  let code = "";
+  for (let i = 0; i < 6; i++) {
+    code += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return code;
+}
+
+async function getUniqueReferralCode(): Promise<string> {
+  let code = generateReferralCode();
+  let exists = await prisma.user.findUnique({ where: { referralCode: code } });
+  while (exists) {
+    code = generateReferralCode();
+    exists = await prisma.user.findUnique({ where: { referralCode: code } });
+  }
+  return code;
+}
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { name, phone, password, email, location } = body;
+    const { name, phone, password, email, location, referralCode } = body;
 
     // Validate required fields
     if (!name || !phone || !password) {
@@ -33,6 +53,18 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // Look up referrer if referral code provided
+    let referrerId: string | null = null;
+    if (referralCode) {
+      const referrer = await prisma.user.findUnique({
+        where: { referralCode: referralCode.toUpperCase() },
+        select: { id: true },
+      });
+      if (referrer) {
+        referrerId = referrer.id;
+      }
+    }
+
     // Hash password and create user
     const passwordHash = await hashPassword(password);
 
@@ -43,6 +75,7 @@ export async function POST(request: NextRequest) {
         passwordHash,
         email: email || null,
         location: location || null,
+        referredBy: referrerId,
       },
       select: {
         id: true,
@@ -56,6 +89,23 @@ export async function POST(request: NextRequest) {
         createdAt: true,
       },
     });
+
+    // Generate unique referral code for the new user
+    const newReferralCode = await getUniqueReferralCode();
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { referralCode: newReferralCode },
+    });
+
+    // If referred by someone, increment their referral count and check rewards
+    if (referrerId) {
+      const updatedReferrer = await prisma.user.update({
+        where: { id: referrerId },
+        data: { referralCount: { increment: 1 } },
+        select: { referralCount: true },
+      });
+      await checkAndGrantRewards(referrerId, updatedReferrer.referralCount, prisma);
+    }
 
     // Sign JWT and set cookie
     const token = signToken({ userId: user.id, role: user.role });

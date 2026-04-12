@@ -6,12 +6,12 @@ import {
   Share2,
   Flag,
   MessageCircle,
-  Copy,
   Check,
   X,
 } from "lucide-react";
 import { useAppStore } from "@/lib/store";
 import { generateWhatsAppLink, formatPrice } from "@/lib/utils";
+import ShareButtons from "@/components/ShareButtons";
 
 interface ListingActionsProps {
   listingId: string;
@@ -41,7 +41,6 @@ export default function ListingActions({
   const [isFav, setIsFav] = useState(initialFav);
   const [favLoading, setFavLoading] = useState(false);
   const [showShare, setShowShare] = useState(false);
-  const [copied, setCopied] = useState(false);
   const [showReport, setShowReport] = useState(false);
   const [reportReason, setReportReason] = useState("");
   const [reportDescription, setReportDescription] = useState("");
@@ -78,24 +77,9 @@ export default function ListingActions({
     }
   }
 
-  function handleCopyLink() {
-    const url = `${window.location.origin}/listings/${listingId}`;
-    navigator.clipboard.writeText(url);
-    setCopied(true);
-    setTimeout(() => {
-      setCopied(false);
-      setShowShare(false);
-    }, 1500);
-  }
-
-  function handleShareWhatsApp() {
-    const url = `${window.location.origin}/listings/${listingId}`;
-    const text = encodeURIComponent(
-      `Check out this listing: "${listingTitle}" on Zambia.net Marketplace\n${url}`
-    );
-    window.open(`https://wa.me/?text=${text}`, "_blank", "noopener,noreferrer");
-    setShowShare(false);
-  }
+  const listingUrl = typeof window !== "undefined"
+    ? `${window.location.origin}/listings/${listingId}`
+    : `/listings/${listingId}`;
 
   async function handleReport() {
     if (!user) {
@@ -161,25 +145,12 @@ export default function ListingActions({
           </button>
 
           {showShare && (
-            <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg z-10 overflow-hidden">
-              <button
-                onClick={handleCopyLink}
-                className="w-full flex items-center gap-2 px-4 py-2.5 hover:bg-gray-50 text-sm text-gray-700"
-              >
-                {copied ? (
-                  <Check className="w-4 h-4 text-green-500" />
-                ) : (
-                  <Copy className="w-4 h-4" />
-                )}
-                {copied ? "Copied!" : "Copy link"}
-              </button>
-              <button
-                onClick={handleShareWhatsApp}
-                className="w-full flex items-center gap-2 px-4 py-2.5 hover:bg-gray-50 text-sm text-gray-700 border-t border-gray-100"
-              >
-                <MessageCircle className="w-4 h-4 text-green-500" />
-                Share on WhatsApp
-              </button>
+            <div className="absolute top-full left-0 mt-2 bg-white border border-gray-200 rounded-xl shadow-lg z-10 p-3">
+              <ShareButtons
+                url={listingUrl}
+                title={`${listingTitle} - Zambia.net Marketplace`}
+                listingId={listingId}
+              />
             </div>
           )}
         </div>

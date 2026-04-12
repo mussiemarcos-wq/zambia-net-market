@@ -48,6 +48,11 @@ export default function AuthModal() {
     setLoading(true);
     setError("");
     try {
+      // Check for stored referral code
+      const storedReferralCode = typeof window !== "undefined"
+        ? localStorage.getItem("referralCode")
+        : null;
+
       const res = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -55,10 +60,15 @@ export default function AuthModal() {
           ...registerForm,
           email: registerForm.email || undefined,
           location: registerForm.location || undefined,
+          referralCode: storedReferralCode || undefined,
         }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
+      // Clear stored referral code after successful registration
+      if (typeof window !== "undefined") {
+        localStorage.removeItem("referralCode");
+      }
       setUser(data);
       closeAuthModal();
       setRegisterForm({ name: "", phone: "", password: "", email: "", location: "" });

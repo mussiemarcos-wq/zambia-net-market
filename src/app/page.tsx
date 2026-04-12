@@ -6,6 +6,7 @@ import CategoryGrid from "@/components/CategoryGrid";
 import ListingCard from "@/components/ListingCard";
 import RecommendedListings from "@/components/RecommendedListings";
 import BannerAd from "@/components/BannerAd";
+import ReferralCapture from "@/components/ReferralCapture";
 
 export const dynamic = "force-dynamic";
 
@@ -87,6 +88,9 @@ export default async function HomePage() {
 
   return (
     <>
+      {/* Capture referral code from URL */}
+      <ReferralCapture />
+
       {/* Hero Section */}
       <section className="bg-gradient-to-br from-blue-600 to-blue-800 text-white">
         <div className="max-w-6xl mx-auto px-4 py-16 md:py-24 text-center">
