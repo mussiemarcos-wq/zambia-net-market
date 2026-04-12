@@ -159,3 +159,81 @@ export const BANNER_PLANS = [
   { id: "banner_category_7", label: "Category Page - 7 Days", placement: "category", days: 7, price: 100, priceNgwee: 10000 },
   { id: "banner_category_14", label: "Category Page - 14 Days", placement: "category", days: 14, price: 180, priceNgwee: 18000 },
 ];
+
+// Premium vertical packages
+export const SERVICE_PROVIDER_PLANS = [
+  {
+    id: "service_basic",
+    name: "Basic",
+    price: 100,
+    priceNgwee: 10000,
+    features: ["5 service listings", "Profile page", "WhatsApp & Telegram contact"],
+  },
+  {
+    id: "service_pro",
+    name: "Professional",
+    price: 250,
+    priceNgwee: 25000,
+    features: ["15 service listings", "Profile page", "Priority in search", "Lead notifications", "Response analytics"],
+  },
+  {
+    id: "service_premium",
+    name: "Premium",
+    price: 500,
+    priceNgwee: 50000,
+    features: ["Unlimited listings", "Featured profile", "Top of search", "Lead notifications", "Full analytics", "Verified badge"],
+  },
+];
+
+export const LEAD_FEE = { price: 5, priceNgwee: 500 }; // Per lead/enquiry
+
+export const JOB_POSTING_PLANS = [
+  {
+    id: "job_single",
+    name: "Single Posting",
+    price: 50,
+    priceNgwee: 5000,
+    days: 30,
+    features: ["1 job listing", "30-day visibility", "Basic applicant tracking"],
+  },
+  {
+    id: "job_pack_5",
+    name: "5-Pack",
+    price: 200,
+    priceNgwee: 20000,
+    days: 60,
+    features: ["5 job listings", "60-day visibility", "Applicant tracking", "Featured in Jobs"],
+  },
+  {
+    id: "job_unlimited",
+    name: "Recruiter Monthly",
+    price: 500,
+    priceNgwee: 50000,
+    days: 30,
+    features: ["Unlimited job listings", "60-day visibility", "Full applicant tracking", "Featured placement", "Company profile", "CV database access"],
+  },
+];
+
+export const PROPERTY_AGENT_PLANS = [
+  {
+    id: "agent_starter",
+    name: "Starter",
+    price: 200,
+    priceNgwee: 20000,
+    features: ["10 property listings", "Agent profile page", "Contact tracking", "60-day listing expiry"],
+  },
+  {
+    id: "agent_professional",
+    name: "Professional",
+    price: 500,
+    priceNgwee: 50000,
+    features: ["50 property listings", "Featured agent profile", "Lead notifications", "Priority placement", "Full analytics", "90-day expiry"],
+  },
+  {
+    id: "agent_agency",
+    name: "Agency",
+    price: 1500,
+    priceNgwee: 150000,
+    features: ["Unlimited listings", "Agency branding page", "Multiple agent accounts", "Top of search", "Full analytics", "Verified agency badge", "API access"],
+  },
+];

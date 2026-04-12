@@ -20,6 +20,7 @@ interface ListingActionsProps {
   listingTitle: string;
   listingPrice: string | number | null;
   isFavourited?: boolean;
+  categorySlug?: string;
 }
 
 const REPORT_REASONS = [
@@ -37,6 +38,7 @@ export default function ListingActions({
   listingTitle,
   listingPrice,
   isFavourited: initialFav = false,
+  categorySlug,
 }: ListingActionsProps) {
   const { user, openAuthModal } = useAppStore();
   const [isFav, setIsFav] = useState(initialFav);
@@ -56,12 +58,44 @@ export default function ListingActions({
     } catch {
       // silently fail tracking
     }
+    // Record lead for services category
+    if (categorySlug === "services") {
+      try {
+        await fetch("/api/leads", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            listingId,
+            buyerName: user?.name || undefined,
+            contactMethod: "whatsapp",
+          }),
+        });
+      } catch {
+        // silently fail lead tracking
+      }
+    }
     const priceStr = listingPrice ? formatPrice(listingPrice) : undefined;
     const link = generateWhatsAppLink(sellerPhone, listingTitle, priceStr);
     window.open(link, "_blank", "noopener,noreferrer");
   }
 
-  function handleTelegramClick() {
+  async function handleTelegramClick() {
+    // Record lead for services category
+    if (categorySlug === "services") {
+      try {
+        await fetch("/api/leads", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            listingId,
+            buyerName: user?.name || undefined,
+            contactMethod: "telegram",
+          }),
+        });
+      } catch {
+        // silently fail lead tracking
+      }
+    }
     const priceStr = listingPrice ? formatPrice(listingPrice) : undefined;
     const link = generateTelegramLink(sellerPhone, listingTitle, priceStr);
     window.open(link, "_blank", "noopener,noreferrer");

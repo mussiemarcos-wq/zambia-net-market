@@ -382,6 +382,7 @@ export default async function ListingDetailPage({ params }: PageProps) {
                 sellerPhone={listing.user.phone}
                 listingTitle={listing.title}
                 listingPrice={listing.price as unknown as string | number | null}
+                categorySlug={listing.category.slug}
               />
             </div>
 
