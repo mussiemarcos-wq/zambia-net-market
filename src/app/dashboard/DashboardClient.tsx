@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import {
   Eye,
@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { formatPrice, timeAgo, cn } from "@/lib/utils";
 import BoostModal from "@/components/BoostModal";
+import BuyerIntentBadge from "@/components/BuyerIntentBadge";
 
 type ListingStatus = "DRAFT" | "ACTIVE" | "EXPIRED" | "SOLD" | "REMOVED";
 
@@ -75,6 +76,22 @@ export default function DashboardClient({
     listingTitle: string;
     mode: "boost" | "feature";
   }>({ isOpen: false, listingId: "", listingTitle: "", mode: "boost" });
+  const [buyerIntentMap, setBuyerIntentMap] = useState<Record<string, number>>({});
+
+  useEffect(() => {
+    fetch("/api/analytics/buyer-intent")
+      .then((res) => res.json())
+      .then((data) => {
+        if (Array.isArray(data)) {
+          const map: Record<string, number> = {};
+          data.forEach((item: { listingId: string; interestedBuyers: number }) => {
+            map[item.listingId] = item.interestedBuyers;
+          });
+          setBuyerIntentMap(map);
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   const filtered =
     activeTab === "ALL"
@@ -227,12 +244,20 @@ export default function DashboardClient({
                       )}
                     </div>
                     <div className="min-w-0">
-                      <Link
-                        href={`/listings/${listing.id}`}
-                        className="font-medium text-gray-900 text-sm hover:text-blue-600 transition line-clamp-1"
-                      >
-                        {listing.title}
-                      </Link>
+                      <div className="flex items-center gap-2">
+                        <Link
+                          href={`/listings/${listing.id}`}
+                          className="font-medium text-gray-900 text-sm hover:text-blue-600 transition line-clamp-1"
+                        >
+                          {listing.title}
+                        </Link>
+                        {listing.status === "ACTIVE" && buyerIntentMap[listing.id] > 0 && (
+                          <BuyerIntentBadge
+                            listingId={listing.id}
+                            count={buyerIntentMap[listing.id]}
+                          />
+                        )}
+                      </div>
                       <p className="text-xs text-gray-500 mt-0.5">
                         {listing.category.name} &middot;{" "}
                         {listing.priceType === "FREE"
