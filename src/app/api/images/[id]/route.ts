@@ -1,9 +1,8 @@
 import { NextRequest } from "next/server";
-import { unlink } from "fs/promises";
-import path from "path";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { success, error, unauthorized } from "@/lib/api";
+import { deleteImage, extractPublicId } from "@/lib/cloudinary";
 
 export async function DELETE(
   _request: NextRequest,
@@ -23,12 +22,17 @@ export async function DELETE(
     if (!image) return error("Image not found", 404);
     if (image.listing.userId !== user.id) return error("Not your image", 403);
 
-    // Delete file from disk
-    try {
-      const filepath = path.join(process.cwd(), "public", image.url);
-      await unlink(filepath);
-    } catch {
-      // File may already be deleted
+    // Delete from Cloudinary if it's a Cloudinary URL
+    if (image.url.includes("cloudinary.com")) {
+      const publicId = extractPublicId(image.url);
+      if (publicId) {
+        try {
+          await deleteImage(publicId);
+        } catch (err) {
+          console.error("Cloudinary delete error:", err);
+          // Continue with database deletion even if Cloudinary fails
+        }
+      }
     }
 
     // Delete from database

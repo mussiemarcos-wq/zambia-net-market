@@ -1,9 +1,17 @@
 import { NextRequest } from "next/server";
 import { prisma } from "@/lib/db";
 import { success, error } from "@/lib/api";
+import { cacheGet, cacheSet } from "@/lib/cache";
+import { CACHE_KEYS } from "@/lib/cache-keys";
 
 export async function GET(request: NextRequest) {
   try {
+    // Check cache first
+    const cached = await cacheGet<unknown[]>(CACHE_KEYS.CATEGORIES);
+    if (cached) {
+      return success(cached);
+    }
+
     const categories = await prisma.category.findMany({
       where: { isActive: true },
       orderBy: { sortOrder: "asc" },
@@ -37,6 +45,9 @@ export async function GET(request: NextRequest) {
       subcategories: cat.subcategories,
       listingCount: cat._count.listings,
     }));
+
+    // Cache for 5 minutes
+    await cacheSet(CACHE_KEYS.CATEGORIES, result, 300);
 
     return success(result);
   } catch (err) {

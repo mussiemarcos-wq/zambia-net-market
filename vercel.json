@@ -1,0 +1,20 @@
+{
+  "crons": [
+    {
+      "path": "/api/admin/expire-listings",
+      "schedule": "0 2 * * *"
+    },
+    {
+      "path": "/api/admin/expire-boosts",
+      "schedule": "0 3 * * *"
+    },
+    {
+      "path": "/api/admin/cleanup-images",
+      "schedule": "0 4 * * 0"
+    },
+    {
+      "path": "/api/saved-searches/check",
+      "schedule": "0 8 * * *"
+    }
+  ]
+}
