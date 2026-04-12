@@ -127,6 +127,19 @@ export async function GET(request: NextRequest) {
 
     const totalPages = Math.ceil(total / limit);
 
+    // Fire-and-forget: log search query to SearchLog for demand gap analysis
+    if (search) {
+      const user = await getCurrentUser().catch(() => null);
+      prisma.searchLog.create({
+        data: {
+          query: search,
+          resultCount: total,
+          categorySlug: category || null,
+          userId: user?.id || null,
+        },
+      }).catch(() => {});
+    }
+
     return success({ listings, total, page, totalPages });
   } catch (err) {
     console.error("GET /api/listings error:", err);

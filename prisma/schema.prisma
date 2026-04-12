@@ -329,3 +329,16 @@ model VerificationRequest {
 
   @@map("verification_requests")
 }
+
+model SearchLog {
+  id           String   @id @default(uuid())
+  query        String
+  resultCount  Int      @default(0) @map("result_count")
+  categorySlug String?  @map("category_slug")
+  userId       String?  @map("user_id")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  @@index([query, createdAt(sort: Desc)])
+  @@index([resultCount])
+  @@map("search_logs")
+}

@@ -19,6 +19,7 @@ import {
   PRICE_TYPE_LABELS,
   CONDITION_LABELS,
 } from "@/lib/constants";
+import PriceSuggestion from "@/components/PriceSuggestion";
 
 const LocationPicker = dynamic(() => import("@/components/LocationPicker"), { ssr: false });
 
@@ -510,6 +511,14 @@ export default function NewListingPage() {
                         </p>
                       )}
                     </div>
+                  )}
+
+                  {/* Price suggestion */}
+                  {form.categoryId && (
+                    <PriceSuggestion
+                      categoryId={form.categoryId}
+                      condition={form.condition}
+                    />
                   )}
 
                   {/* Condition */}

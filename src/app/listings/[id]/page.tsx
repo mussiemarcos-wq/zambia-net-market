@@ -8,6 +8,7 @@ import { ListingStatus, Prisma } from "@prisma/client";
 import { generateListingJsonLd } from "@/lib/seo";
 import ListingActions from "./ListingActions";
 import ListingLocationMap from "./ListingLocationMap";
+import SocialProof from "@/components/SocialProof";
 import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
@@ -88,6 +89,11 @@ export default async function ListingDetailPage({ params }: PageProps) {
       data: { viewsCount: { increment: 1 } },
     })
     .catch(() => {});
+
+  // Fetch favourites count for social proof
+  const favouritesCount = await prisma.favourite.count({
+    where: { listingId: id },
+  });
 
   // Fetch seller review stats
   const sellerReviewAgg = await prisma.review.aggregate({
@@ -247,6 +253,14 @@ export default async function ListingDetailPage({ params }: PageProps) {
                   {CONDITION_LABELS[listing.condition] || listing.condition}
                 </span>
               </div>
+
+              {/* Social proof indicators */}
+              <SocialProof
+                viewsCount={listing.viewsCount + 1}
+                favouritesCount={favouritesCount}
+                whatsappClicks={listing.whatsappClicks}
+                createdAt={listing.createdAt.toISOString()}
+              />
             </div>
 
             {/* Description */}
