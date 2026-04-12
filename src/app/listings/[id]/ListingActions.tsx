@@ -10,7 +10,8 @@ import {
   X,
 } from "lucide-react";
 import { useAppStore } from "@/lib/store";
-import { generateWhatsAppLink, formatPrice } from "@/lib/utils";
+import { generateWhatsAppLink, generateTelegramLink, formatPrice } from "@/lib/utils";
+import { Send } from "lucide-react";
 import ShareButtons from "@/components/ShareButtons";
 
 interface ListingActionsProps {
@@ -57,6 +58,12 @@ export default function ListingActions({
     }
     const priceStr = listingPrice ? formatPrice(listingPrice) : undefined;
     const link = generateWhatsAppLink(sellerPhone, listingTitle, priceStr);
+    window.open(link, "_blank", "noopener,noreferrer");
+  }
+
+  function handleTelegramClick() {
+    const priceStr = listingPrice ? formatPrice(listingPrice) : undefined;
+    const link = generateTelegramLink(sellerPhone, listingTitle, priceStr);
     window.open(link, "_blank", "noopener,noreferrer");
   }
 
@@ -109,14 +116,23 @@ export default function ListingActions({
 
   return (
     <div className="space-y-3">
-      {/* WhatsApp button */}
-      <button
-        onClick={handleWhatsAppClick}
-        className="w-full flex items-center justify-center gap-2 bg-green-500 hover:bg-green-600 text-white font-semibold py-3.5 px-6 rounded-xl transition-colors text-lg"
-      >
-        <MessageCircle className="w-5 h-5" />
-        Contact on WhatsApp
-      </button>
+      {/* Contact buttons */}
+      <div className="flex gap-2">
+        <button
+          onClick={handleWhatsAppClick}
+          className="flex-1 flex items-center justify-center gap-2 bg-green-500 hover:bg-green-600 text-white font-semibold py-3.5 px-4 rounded-xl transition-colors"
+        >
+          <MessageCircle className="w-5 h-5" />
+          WhatsApp
+        </button>
+        <button
+          onClick={handleTelegramClick}
+          className="flex-1 flex items-center justify-center gap-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3.5 px-4 rounded-xl transition-colors"
+        >
+          <Send className="w-5 h-5" />
+          Telegram
+        </button>
+      </div>
 
       {/* Favourite and Share row */}
       <div className="flex gap-2">

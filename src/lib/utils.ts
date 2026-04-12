@@ -37,6 +37,19 @@ export function generateWhatsAppLink(
   return `https://wa.me/${cleanPhone}?text=${message}`;
 }
 
+export function generateTelegramLink(
+  phone: string,
+  listingTitle: string,
+  price?: string | null
+): string {
+  const cleanPhone = phone.replace(/\D/g, "");
+  const priceText = price ? ` - ${price}` : "";
+  const message = encodeURIComponent(
+    `Hi, I'm interested in your listing: "${listingTitle}"${priceText} on Zambia.net Marketplace`
+  );
+  return `https://t.me/+${cleanPhone}?text=${message}`;
+}
+
 export function truncate(str: string, length: number): string {
   if (str.length <= length) return str;
   return str.slice(0, length) + "...";
