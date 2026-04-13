@@ -19,10 +19,10 @@ export default function CategoryGrid({ categories }: { categories: Category[] })
           href={`/search?category=${cat.slug}`}
           className="flex flex-col items-center gap-2 p-3 rounded-xl hover:bg-blue-50 transition group"
         >
-          <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center text-2xl group-hover:bg-blue-100 transition">
+          <div className="w-16 h-16 bg-gray-100 rounded-xl flex items-center justify-center text-4xl group-hover:bg-blue-100 transition">
             {cat.icon || "📦"}
           </div>
-          <span className="text-xs font-medium text-gray-700 text-center leading-tight">
+          <span className="text-sm font-medium text-gray-700 text-center leading-tight">
             {cat.name}
           </span>
           {cat._count && (
