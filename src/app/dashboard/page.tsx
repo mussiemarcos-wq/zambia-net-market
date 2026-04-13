@@ -4,6 +4,7 @@ import { prisma } from "@/lib/db";
 import DashboardClient from "./DashboardClient";
 import RepostReminders from "@/components/RepostReminders";
 import RecentlyViewed from "@/components/RecentlyViewed";
+import ShareMarketplace from "@/components/ShareMarketplace";
 import Link from "next/link";
 import { Plus, BarChart3, Building2, BadgeCheck, CreditCard, Gift, Wrench, Briefcase, Home, Car, TrendingUp, Code, User } from "lucide-react";
 
@@ -74,6 +75,9 @@ export default async function DashboardPage() {
           New Listing
         </Link>
       </div>
+
+      {/* Share the marketplace */}
+      <ShareMarketplace />
 
       {/* Quick Links */}
       <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-3 mb-6">
