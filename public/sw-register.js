@@ -1,13 +1,15 @@
-if ('serviceWorker' in navigator) {
-  // Only register service worker in production
-  if (window.location.hostname !== 'localhost') {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('/sw.js').catch(() => {});
-    });
-  } else {
-    // Unregister any existing service worker in dev
-    navigator.serviceWorker.getRegistrations().then((registrations) => {
-      registrations.forEach((r) => r.unregister());
-    });
+// Kill switch: unregister all service workers and clear caches.
+// The service worker was causing hydration mismatches after deploys because
+// it served stale JS chunks. Disabling until we implement a proper
+// versioning/skipWaiting strategy.
+(function () {
+  if (!('serviceWorker' in navigator)) return;
+  navigator.serviceWorker.getRegistrations().then(function (registrations) {
+    registrations.forEach(function (r) { r.unregister(); });
+  }).catch(function () {});
+  if (typeof caches !== 'undefined') {
+    caches.keys().then(function (keys) {
+      keys.forEach(function (key) { caches.delete(key); });
+    }).catch(function () {});
   }
-}
+})();
