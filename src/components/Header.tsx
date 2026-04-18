@@ -29,8 +29,12 @@ export default function Header() {
     fetch("/api/auth/me")
       .then((r) => (r.ok ? r.json() : null))
       .then((data) => {
-        if (data) setUser(data);
-      });
+        if (!data) return;
+        // Handle both { user: {...} } and direct user object shapes
+        const u = data.user && typeof data.user === "object" ? data.user : data;
+        if (u && u.id) setUser(u);
+      })
+      .catch(() => {});
   }, [setUser]);
 
   useEffect(() => {

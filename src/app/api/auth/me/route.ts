@@ -9,7 +9,7 @@ export async function GET() {
       return unauthorized("Not authenticated");
     }
 
-    return success({ user });
+    return success(user);
   } catch (err) {
     console.error("Get current user error:", err);
     return error("Internal server error", 500);
