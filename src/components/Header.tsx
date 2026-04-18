@@ -123,13 +123,13 @@ export default function Header() {
                         />
                       ) : (
                         <span className="text-sm font-semibold text-blue-600 dark:text-blue-300">
-                          {user.name.charAt(0).toUpperCase()}
+                          {(user.name || "U").charAt(0).toUpperCase()}
                         </span>
                       )}
                     </div>
                     <div className="hidden lg:flex flex-col items-start leading-tight">
                       <span className="text-sm font-medium">
-                        {user.name.split(" ")[0]}
+                        {(user.name || "User").split(" ")[0]}
                       </span>
                       {(user.role === "ADMIN" ||
                         user.role === "SUPER_ADMIN") && (
