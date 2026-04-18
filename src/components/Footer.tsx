@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { CATEGORIES_WITH_SUBS } from "@/lib/constants";
 
 export default function Footer() {
   return (
@@ -19,11 +20,16 @@ export default function Footer() {
           <div>
             <h4 className="text-white font-semibold mb-3 text-sm">Categories</h4>
             <ul className="space-y-2 text-sm">
-              <li><Link href="/search?category=property" className="hover:text-white transition">Property</Link></li>
-              <li><Link href="/search?category=vehicles" className="hover:text-white transition">Vehicles</Link></li>
-              <li><Link href="/search?category=jobs" className="hover:text-white transition">Jobs</Link></li>
-              <li><Link href="/search?category=services" className="hover:text-white transition">Services</Link></li>
-              <li><Link href="/search?category=electronics" className="hover:text-white transition">Electronics</Link></li>
+              {CATEGORIES_WITH_SUBS.map((cat) => (
+                <li key={cat.slug}>
+                  <Link
+                    href={`/search?category=${cat.slug}`}
+                    className="hover:text-white transition"
+                  >
+                    {cat.name}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
           <div>
@@ -31,12 +37,15 @@ export default function Footer() {
             <ul className="space-y-2 text-sm">
               <li><Link href="/listings/new" className="hover:text-white transition">Post an Ad</Link></li>
               <li><Link href="/dashboard" className="hover:text-white transition">Seller Dashboard</Link></li>
+              <li><Link href="/dashboard/referrals" className="hover:text-white transition">Invite & Earn</Link></li>
+              <li><Link href="/developers" className="hover:text-white transition">Developer API</Link></li>
             </ul>
           </div>
           <div>
             <h4 className="text-white font-semibold mb-3 text-sm">Support</h4>
             <ul className="space-y-2 text-sm">
               <li><Link href="/about" className="hover:text-white transition">About Us</Link></li>
+              <li><Link href="/contact" className="hover:text-white transition">Contact Us</Link></li>
               <li><Link href="/terms" className="hover:text-white transition">Terms of Service</Link></li>
               <li><Link href="/privacy" className="hover:text-white transition">Privacy Policy</Link></li>
             </ul>

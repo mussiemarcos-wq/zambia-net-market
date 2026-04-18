@@ -1,3 +1,42 @@
 @import "tailwindcss";
 
 @custom-variant dark (&:where(.dark, .dark *));
+
+/* Stronger default contrast for form inputs */
+input,
+textarea,
+select {
+  color: #111827; /* gray-900 */
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #6b7280; /* gray-500 - stronger than browser default */
+  opacity: 1;
+}
+
+/* Dark mode input colors */
+.dark input,
+.dark textarea,
+.dark select {
+  color: #f3f4f6; /* gray-100 */
+  background-color: #1f2937; /* gray-800 */
+  border-color: #374151; /* gray-700 */
+}
+
+.dark input::placeholder,
+.dark textarea::placeholder {
+  color: #9ca3af; /* gray-400 */
+  opacity: 1;
+}
+
+/* Select dropdown options */
+select option {
+  color: #111827;
+  background-color: #ffffff;
+}
+
+.dark select option {
+  color: #f3f4f6;
+  background-color: #1f2937;
+}

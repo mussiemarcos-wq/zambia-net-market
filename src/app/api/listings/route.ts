@@ -29,11 +29,22 @@ export async function GET(request: NextRequest) {
     };
 
     if (category) {
-      where.categoryId = category;
+      // Support both slug and UUID for category filter
+      const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(category);
+      if (isUuid) {
+        where.categoryId = category;
+      } else {
+        where.category = { slug: category };
+      }
     }
 
     if (subcategory) {
-      where.subcategoryId = subcategory;
+      const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(subcategory);
+      if (isUuid) {
+        where.subcategoryId = subcategory;
+      } else {
+        where.subcategory = { slug: subcategory };
+      }
     }
 
     if (search) {

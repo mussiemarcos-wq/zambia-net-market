@@ -75,7 +75,10 @@ export default function ListingActions({
       }
     }
     const priceStr = listingPrice ? formatPrice(listingPrice) : undefined;
-    const link = generateWhatsAppLink(sellerPhone, listingTitle, priceStr);
+    const listingUrl = typeof window !== "undefined"
+      ? `${window.location.origin}/listings/${listingId}`
+      : undefined;
+    const link = generateWhatsAppLink(sellerPhone, listingTitle, priceStr, listingUrl);
     window.open(link, "_blank", "noopener,noreferrer");
   }
 
@@ -97,7 +100,10 @@ export default function ListingActions({
       }
     }
     const priceStr = listingPrice ? formatPrice(listingPrice) : undefined;
-    const link = generateTelegramLink(sellerPhone, listingTitle, priceStr);
+    const listingUrl = typeof window !== "undefined"
+      ? `${window.location.origin}/listings/${listingId}`
+      : undefined;
+    const link = generateTelegramLink(sellerPhone, listingTitle, priceStr, listingUrl);
     window.open(link, "_blank", "noopener,noreferrer");
   }
 

@@ -273,7 +273,7 @@ export default async function SellerProfilePage({ params }: SellerPageProps) {
         )}
 
         {/* Listings Section */}
-        <div>
+        <div id="listings" className="scroll-mt-20">
           <h2 className="text-xl font-bold text-gray-900 mb-5">
             Listings ({serializedListings.length})
           </h2>
@@ -294,7 +294,7 @@ export default async function SellerProfilePage({ params }: SellerPageProps) {
         </div>
 
         {/* Reviews Section */}
-        <div className="mt-10">
+        <div id="reviews" className="mt-10 scroll-mt-20">
           <ReviewList
             sellerId={id}
             sellerName={user.name}

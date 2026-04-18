@@ -1,6 +1,6 @@
-import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import DashboardAuthPrompt from "@/components/DashboardAuthPrompt";
 import DashboardClient from "./DashboardClient";
 import RepostReminders from "@/components/RepostReminders";
 import RecentlyViewed from "@/components/RecentlyViewed";
@@ -16,7 +16,9 @@ export const metadata = {
 
 export default async function DashboardPage() {
   const user = await getCurrentUser();
-  if (!user) redirect("/");
+  if (!user) {
+    return <DashboardAuthPrompt />;
+  }
 
   const listings = await prisma.listing.findMany({
     where: { userId: user.id },

@@ -27,12 +27,16 @@ export function timeAgo(date: string | Date): string {
 export function generateWhatsAppLink(
   phone: string,
   listingTitle: string,
-  price?: string | null
+  price?: string | null,
+  listingUrl?: string
 ): string {
   const cleanPhone = phone.replace(/\D/g, "");
   const priceText = price ? ` - ${price}` : "";
+  const urlText = listingUrl ? `\n\n${listingUrl}` : "";
+  // Use "Zambia Marketplace" (no dot) in plain text to prevent auto-linking
+  // to the zambia.net domain. Include the actual listing URL separately.
   const message = encodeURIComponent(
-    `Hi, I'm interested in your listing: "${listingTitle}"${priceText} on Zambia.net Marketplace`
+    `Hi, I'm interested in your listing: "${listingTitle}"${priceText} on Zambia Marketplace.${urlText}`
   );
   return `https://wa.me/${cleanPhone}?text=${message}`;
 }
@@ -40,12 +44,14 @@ export function generateWhatsAppLink(
 export function generateTelegramLink(
   phone: string,
   listingTitle: string,
-  price?: string | null
+  price?: string | null,
+  listingUrl?: string
 ): string {
   const cleanPhone = phone.replace(/\D/g, "");
   const priceText = price ? ` - ${price}` : "";
+  const urlText = listingUrl ? `\n\n${listingUrl}` : "";
   const message = encodeURIComponent(
-    `Hi, I'm interested in your listing: "${listingTitle}"${priceText} on Zambia.net Marketplace`
+    `Hi, I'm interested in your listing: "${listingTitle}"${priceText} on Zambia Marketplace.${urlText}`
   );
   return `https://t.me/+${cleanPhone}?text=${message}`;
 }

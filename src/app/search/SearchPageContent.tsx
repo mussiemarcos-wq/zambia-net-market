@@ -78,6 +78,7 @@ export default function SearchPageContent() {
   const [totalPages, setTotalPages] = useState(0);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
+  const [searchError, setSearchError] = useState(false);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [viewMode, setViewMode] = useState<"grid" | "map">("grid");
   const [currentPage, setCurrentPage] = useState(1);
@@ -149,6 +150,7 @@ export default function SearchPageContent() {
       }
 
       try {
+        setSearchError(false);
         const params = new URLSearchParams();
         params.set("page", String(currentPage));
         params.set("limit", "20");
@@ -167,15 +169,20 @@ export default function SearchPageContent() {
         const data: ApiResponse = await res.json();
 
         if (isFirstPage) {
-          setListings(data.listings);
+          setListings(data.listings || []);
         } else {
-          setListings((prev) => [...prev, ...data.listings]);
+          setListings((prev) => [...prev, ...(data.listings || [])]);
         }
-        setTotal(data.total);
-        setTotalPages(data.totalPages);
+        setTotal(data.total || 0);
+        setTotalPages(data.totalPages || 0);
       } catch (err: unknown) {
         if (err instanceof DOMException && err.name === "AbortError") return;
         console.error("Error fetching listings:", err);
+        setSearchError(true);
+        if (isFirstPage) {
+          setListings([]);
+          setTotal(0);
+        }
       } finally {
         setLoading(false);
         setLoadingMore(false);
@@ -599,24 +606,54 @@ export default function SearchPageContent() {
             />
           )}
 
+          {/* Error State */}
+          {!loading && searchError && listings.length === 0 && (
+            <div className="text-center py-20">
+              <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                <PackageOpen className="w-8 h-8 text-red-400" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-1">
+                Something went wrong
+              </h3>
+              <p className="text-gray-500 text-sm mb-6 max-w-sm mx-auto">
+                We couldn&apos;t load listings right now. Please check your
+                connection and try again.
+              </p>
+              <button
+                onClick={() => window.location.reload()}
+                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg text-sm font-medium transition"
+              >
+                Try Again
+              </button>
+            </div>
+          )}
+
           {/* Empty State */}
-          {!loading && listings.length === 0 && (
+          {!loading && !searchError && listings.length === 0 && (
             <div className="text-center py-20">
               <PackageOpen className="w-16 h-16 text-gray-300 mx-auto mb-4" />
               <h3 className="text-lg font-semibold text-gray-900 mb-1">
                 No listings found
               </h3>
               <p className="text-gray-500 text-sm mb-6 max-w-sm mx-auto">
-                Try adjusting your search or filters to find what you are looking
-                for.
+                {hasActiveFilters
+                  ? "Try adjusting your search or filters to find what you are looking for."
+                  : "Be the first to post a listing in this category!"}
               </p>
-              {hasActiveFilters && (
+              {hasActiveFilters ? (
                 <button
                   onClick={clearAllFilters}
                   className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg text-sm font-medium transition"
                 >
                   Clear All Filters
                 </button>
+              ) : (
+                <a
+                  href="/listings/new"
+                  className="inline-block bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg text-sm font-medium transition"
+                >
+                  Post a Listing
+                </a>
               )}
             </div>
           )}

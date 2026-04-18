@@ -35,6 +35,8 @@ export default function ReviewList({
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(true);
+  const [initialLoaded, setInitialLoaded] = useState(false);
+  const [fetchError, setFetchError] = useState(false);
   const [showForm, setShowForm] = useState(false);
 
   const openAuthModal = useAppStore((s) => s.openAuthModal);
@@ -42,6 +44,12 @@ export default function ReviewList({
   const fetchReviews = useCallback(
     async (pageNum: number, append = false) => {
       setLoading(true);
+      setFetchError(false);
+      // Safety timeout - never leave in a stuck loading state
+      const timeoutId = setTimeout(() => {
+        setLoading(false);
+        setInitialLoaded(true);
+      }, 10000);
       try {
         const res = await fetch(
           `/api/reviews?sellerId=${sellerId}&page=${pageNum}&limit=10`
@@ -49,16 +57,22 @@ export default function ReviewList({
         if (res.ok) {
           const data = await res.json();
           setReviews((prev) =>
-            append ? [...prev, ...data.reviews] : data.reviews
+            append ? [...prev, ...(data.reviews || [])] : (data.reviews || [])
           );
-          setTotal(data.total);
-          setTotalPages(data.totalPages);
-          setPage(data.page);
+          setTotal(data.total || 0);
+          setTotalPages(data.totalPages || 1);
+          setPage(data.page || 1);
+        } else {
+          setFetchError(true);
+          if (!append) setReviews([]);
         }
       } catch {
-        // silently fail
+        setFetchError(true);
+        if (!append) setReviews([]);
       } finally {
+        clearTimeout(timeoutId);
         setLoading(false);
+        setInitialLoaded(true);
       }
     },
     [sellerId]
@@ -105,9 +119,19 @@ export default function ReviewList({
         )}
       </div>
 
-      {loading && reviews.length === 0 ? (
+      {!initialLoaded ? (
         <div className="bg-white rounded-xl border border-gray-200 p-8 text-center">
           <p className="text-gray-500 text-sm">Loading reviews...</p>
+        </div>
+      ) : fetchError && reviews.length === 0 ? (
+        <div className="bg-white rounded-xl border border-gray-200 p-8 text-center">
+          <p className="text-gray-500">Couldn&apos;t load reviews right now</p>
+          <button
+            onClick={() => fetchReviews(1)}
+            className="mt-3 text-sm text-blue-600 hover:text-blue-700 font-medium"
+          >
+            Try again
+          </button>
         </div>
       ) : reviews.length === 0 ? (
         <div className="bg-white rounded-xl border border-gray-200 p-8 text-center">

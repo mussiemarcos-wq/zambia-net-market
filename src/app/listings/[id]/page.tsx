@@ -458,7 +458,7 @@ export default async function ListingDetailPage({ params }: PageProps) {
               )}
               <div className="flex gap-2 mt-4">
                 <Link
-                  href={`/sellers/${listing.user.id}`}
+                  href={`/sellers/${listing.user.id}#listings`}
                   className="flex-1 text-center py-2 border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
                 >
                   View all listings

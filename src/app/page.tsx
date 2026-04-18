@@ -176,7 +176,7 @@ export default async function HomePage() {
           <div className="text-center py-16 text-gray-500">
             <p className="text-lg">No listings yet. Be the first to post!</p>
             <Link
-              href="/post"
+              href="/listings/new"
               className="mt-4 inline-block bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition"
             >
               Post a Listing
@@ -186,7 +186,7 @@ export default async function HomePage() {
       </section>
 
       {/* Recommended / Trending */}
-      <RecommendedListings />
+      <RecommendedListings excludeIds={listings.map((l) => l.id)} />
 
       {/* How It Works */}
       <section className="bg-white border-t border-b border-gray-200">

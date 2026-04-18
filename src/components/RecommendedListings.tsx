@@ -19,7 +19,13 @@ interface RecommendedListing {
   category: { name: string };
 }
 
-export default function RecommendedListings() {
+interface RecommendedListingsProps {
+  excludeIds?: string[];
+}
+
+export default function RecommendedListings({
+  excludeIds = [],
+}: RecommendedListingsProps) {
   const [listings, setListings] = useState<RecommendedListing[]>([]);
   const [type, setType] = useState<"personalized" | "trending">("trending");
   const [loading, setLoading] = useState(true);
@@ -28,13 +34,19 @@ export default function RecommendedListings() {
     fetch("/api/recommendations")
       .then((res) => res.json())
       .then((data) => {
-        setListings(data.listings || []);
+        const all: RecommendedListing[] = data.listings || [];
+        // Filter out listings already shown in "Recent Listings" section
+        const filtered = excludeIds.length > 0
+          ? all.filter((l) => !excludeIds.includes(l.id))
+          : all;
+        setListings(filtered);
         setType(data.type || "trending");
       })
       .catch(() => {
         setListings([]);
       })
       .finally(() => setLoading(false));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   if (loading) {
