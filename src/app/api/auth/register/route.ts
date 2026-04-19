@@ -118,7 +118,7 @@ export async function POST(request: NextRequest) {
       maxAge: 60 * 60 * 24 * 7, // 7 days
     });
 
-    return success({ user }, 201);
+    return success(user, 201);
   } catch (err) {
     console.error("Registration error:", err);
     return error("Internal server error", 500);

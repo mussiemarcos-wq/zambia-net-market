@@ -35,7 +35,9 @@ export default function AuthModal() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
-      setUser(data);
+      // Handle both {user: {...}} and direct user object shapes
+      const u = data.user && typeof data.user === "object" ? data.user : data;
+      setUser(u);
       closeAuthModal();
       setLoginForm({ phone: "", password: "" });
     } catch (err: unknown) {
@@ -71,7 +73,9 @@ export default function AuthModal() {
       if (typeof window !== "undefined") {
         localStorage.removeItem("referralCode");
       }
-      setUser(data);
+      // Handle both {user: {...}} and direct user object shapes
+      const u = data.user && typeof data.user === "object" ? data.user : data;
+      setUser(u);
       closeAuthModal();
       setRegisterForm({ name: "", phone: "", password: "", email: "", location: "" });
     } catch (err: unknown) {

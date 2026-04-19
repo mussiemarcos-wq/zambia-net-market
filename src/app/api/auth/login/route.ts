@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
     // Return user data without password
     const { passwordHash: _, ...userData } = user;
 
-    return success({ user: userData });
+    return success(userData);
   } catch (err) {
     console.error("Login error:", err);
     return error("Internal server error", 500);
