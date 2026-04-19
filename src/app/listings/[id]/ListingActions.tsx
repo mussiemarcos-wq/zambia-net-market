@@ -50,18 +50,41 @@ export default function ListingActions({
   const [reportSubmitting, setReportSubmitting] = useState(false);
   const [reportSubmitted, setReportSubmitted] = useState(false);
 
-  async function handleWhatsAppClick() {
+  // Pre-compute URLs synchronously so the <a> tag navigates immediately on click.
+  // This is critical on iOS (Safari + PWA standalone) where async handlers
+  // prevent wa.me/t.me universal links from launching the native app.
+  const priceStr = listingPrice ? formatPrice(listingPrice) : undefined;
+  const listingUrl =
+    typeof window !== "undefined"
+      ? `${window.location.origin}/listings/${listingId}`
+      : undefined;
+  const whatsappUrl = generateWhatsAppLink(
+    sellerPhone,
+    listingTitle,
+    priceStr,
+    listingUrl
+  );
+  const telegramUrl = generateTelegramLink(
+    sellerPhone,
+    listingTitle,
+    priceStr,
+    listingUrl
+  );
+
+  // Fire-and-forget tracking that does NOT block navigation.
+  // Uses `keepalive` so the request completes even after navigation starts.
+  function trackWhatsAppClick() {
     try {
-      await fetch(`/api/listings/${listingId}/whatsapp-click`, {
+      fetch(`/api/listings/${listingId}/whatsapp-click`, {
         method: "POST",
-      });
+        keepalive: true,
+      }).catch(() => {});
     } catch {
-      // silently fail tracking
+      // ignore
     }
-    // Record lead for services category
     if (categorySlug === "services") {
       try {
-        await fetch("/api/leads", {
+        fetch("/api/leads", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -69,24 +92,18 @@ export default function ListingActions({
             buyerName: user?.name || undefined,
             contactMethod: "whatsapp",
           }),
-        });
+          keepalive: true,
+        }).catch(() => {});
       } catch {
-        // silently fail lead tracking
+        // ignore
       }
     }
-    const priceStr = listingPrice ? formatPrice(listingPrice) : undefined;
-    const listingUrl = typeof window !== "undefined"
-      ? `${window.location.origin}/listings/${listingId}`
-      : undefined;
-    const link = generateWhatsAppLink(sellerPhone, listingTitle, priceStr, listingUrl);
-    window.open(link, "_blank", "noopener,noreferrer");
   }
 
-  async function handleTelegramClick() {
-    // Record lead for services category
+  function trackTelegramClick() {
     if (categorySlug === "services") {
       try {
-        await fetch("/api/leads", {
+        fetch("/api/leads", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -94,17 +111,12 @@ export default function ListingActions({
             buyerName: user?.name || undefined,
             contactMethod: "telegram",
           }),
-        });
+          keepalive: true,
+        }).catch(() => {});
       } catch {
-        // silently fail lead tracking
+        // ignore
       }
     }
-    const priceStr = listingPrice ? formatPrice(listingPrice) : undefined;
-    const listingUrl = typeof window !== "undefined"
-      ? `${window.location.origin}/listings/${listingId}`
-      : undefined;
-    const link = generateTelegramLink(sellerPhone, listingTitle, priceStr, listingUrl);
-    window.open(link, "_blank", "noopener,noreferrer");
   }
 
   async function toggleFavourite() {
@@ -124,9 +136,7 @@ export default function ListingActions({
     }
   }
 
-  const listingUrl = typeof window !== "undefined"
-    ? `${window.location.origin}/listings/${listingId}`
-    : `/listings/${listingId}`;
+  const shareUrl = listingUrl || `/listings/${listingId}`;
 
   async function handleReport() {
     if (!user) {
@@ -156,22 +166,28 @@ export default function ListingActions({
 
   return (
     <div className="space-y-3">
-      {/* Contact buttons */}
+      {/* Contact buttons - use <a> so native browser handles universal links on iOS */}
       <div className="flex gap-2">
-        <button
-          onClick={handleWhatsAppClick}
+        <a
+          href={whatsappUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={trackWhatsAppClick}
           className="flex-1 flex items-center justify-center gap-2 bg-green-500 hover:bg-green-600 text-white font-semibold py-3.5 px-4 rounded-xl transition-colors"
         >
           <MessageCircle className="w-5 h-5" />
           WhatsApp
-        </button>
-        <button
-          onClick={handleTelegramClick}
+        </a>
+        <a
+          href={telegramUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={trackTelegramClick}
           className="flex-1 flex items-center justify-center gap-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3.5 px-4 rounded-xl transition-colors"
         >
           <Send className="w-5 h-5" />
           Telegram
-        </button>
+        </a>
       </div>
 
       {/* Favourite and Share row */}
@@ -203,7 +219,7 @@ export default function ListingActions({
           {showShare && (
             <div className="absolute top-full left-0 mt-2 bg-white border border-gray-200 rounded-xl shadow-lg z-10 p-3">
               <ShareButtons
-                url={listingUrl}
+                url={shareUrl}
                 title={`${listingTitle} - Zambia.net Marketplace`}
                 listingId={listingId}
               />
