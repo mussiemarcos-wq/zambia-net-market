@@ -90,6 +90,21 @@ export const CATEGORIES_WITH_SUBS = [
       { name: "Accessories", slug: "fashion-accessories" },
     ],
   },
+  {
+    name: "Miscellaneous",
+    slug: "miscellaneous",
+    icon: "📦",
+    subcategories: [
+      { name: "Books & Stationery", slug: "misc-books" },
+      { name: "Pets & Animals", slug: "misc-pets" },
+      { name: "Sports & Fitness", slug: "misc-sports" },
+      { name: "Hobbies & Collectibles", slug: "misc-hobbies" },
+      { name: "Kids & Baby", slug: "misc-kids" },
+      { name: "Health & Beauty", slug: "misc-health" },
+      { name: "Food & Agriculture", slug: "misc-food" },
+      { name: "Other", slug: "misc-other" },
+    ],
+  },
 ];
 
 export const LISTING_LIMITS = {
