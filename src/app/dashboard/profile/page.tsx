@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { User, Save, Lock, Eye, EyeOff } from "lucide-react";
+import { User, Save, Lock, Eye, EyeOff, Camera, Loader2, Trash2 } from "lucide-react";
+import DashboardAuthPrompt from "@/components/DashboardAuthPrompt";
 
 interface UserProfile {
   id: string;
@@ -20,6 +21,12 @@ export default function ProfileEditPage() {
   const router = useRouter();
   const [user, setUser] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [needsAuth, setNeedsAuth] = useState(false);
+
+  // Avatar upload
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [avatarUploading, setAvatarUploading] = useState(false);
+  const [avatarError, setAvatarError] = useState<string | null>(null);
 
   // Profile form
   const [name, setName] = useState("");
@@ -40,9 +47,13 @@ export default function ProfileEditPage() {
   useEffect(() => {
     async function fetchUser() {
       try {
-        const res = await fetch("/api/users/me");
+        const res = await fetch("/api/users/me", { cache: "no-store" });
+        if (res.status === 401) {
+          setNeedsAuth(true);
+          return;
+        }
         if (!res.ok) {
-          router.push("/");
+          setNeedsAuth(true);
           return;
         }
         const data = await res.json();
@@ -51,13 +62,49 @@ export default function ProfileEditPage() {
         setEmail(data.email || "");
         setLocation(data.location || "");
       } catch {
-        router.push("/");
+        setNeedsAuth(true);
       } finally {
         setLoading(false);
       }
     }
     fetchUser();
-  }, [router]);
+  }, []);
+
+  async function handleAvatarUpload(file: File) {
+    setAvatarUploading(true);
+    setAvatarError(null);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await fetch("/api/users/me/avatar", {
+        method: "POST",
+        body: formData,
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setAvatarError(data.error || "Upload failed");
+      } else {
+        setUser(data);
+      }
+    } catch {
+      setAvatarError("Something went wrong. Please try again.");
+    } finally {
+      setAvatarUploading(false);
+    }
+  }
+
+  async function handleAvatarRemove() {
+    if (!confirm("Remove your profile picture?")) return;
+    setAvatarUploading(true);
+    try {
+      const res = await fetch("/api/users/me/avatar", { method: "DELETE" });
+      if (res.ok) {
+        setUser((prev) => (prev ? { ...prev, avatarUrl: null } : prev));
+      }
+    } finally {
+      setAvatarUploading(false);
+    }
+  }
 
   async function handleProfileSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -127,6 +174,8 @@ export default function ProfileEditPage() {
     }
   }
 
+  if (needsAuth) return <DashboardAuthPrompt />;
+
   if (loading) {
     return (
       <div className="max-w-3xl mx-auto px-4 py-12">
@@ -140,7 +189,7 @@ export default function ProfileEditPage() {
 
   if (!user) return null;
 
-  const initials = user.name
+  const initials = (user.name || "U")
     .split(" ")
     .map((n) => n[0])
     .join("")
@@ -154,7 +203,7 @@ export default function ProfileEditPage() {
       {/* Avatar & Info */}
       <div className="bg-white border border-gray-200 rounded-xl p-6 mb-6">
         <div className="flex items-center gap-4 mb-6">
-          <div className="relative">
+          <div className="relative group">
             {user.avatarUrl ? (
               <img
                 src={user.avatarUrl}
@@ -166,13 +215,63 @@ export default function ProfileEditPage() {
                 <span className="text-2xl font-bold text-blue-600">{initials}</span>
               </div>
             )}
+            {/* Camera overlay on hover */}
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={avatarUploading}
+              className="absolute bottom-0 right-0 w-7 h-7 bg-blue-600 hover:bg-blue-700 text-white rounded-full flex items-center justify-center shadow-md transition disabled:opacity-50"
+              aria-label="Change profile picture"
+            >
+              {avatarUploading ? (
+                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+              ) : (
+                <Camera className="w-3.5 h-3.5" />
+              )}
+            </button>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/jpeg,image/png,image/webp,image/gif"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) handleAvatarUpload(file);
+                e.target.value = "";
+              }}
+              className="hidden"
+            />
           </div>
-          <div>
+          <div className="flex-1">
             <h2 className="text-lg font-semibold text-gray-900">{user.name}</h2>
             <p className="text-sm text-gray-500">{user.phone}</p>
             <p className="text-xs text-gray-400 mt-1">
               Member since {new Date(user.createdAt).toLocaleDateString("en-ZM", { year: "numeric", month: "long" })}
             </p>
+            <div className="flex gap-2 mt-2">
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={avatarUploading}
+                className="inline-flex items-center gap-1 text-xs text-blue-600 hover:text-blue-700 font-medium"
+              >
+                <Camera className="w-3 h-3" />
+                {user.avatarUrl ? "Change photo" : "Add photo"}
+              </button>
+              {user.avatarUrl && (
+                <button
+                  type="button"
+                  onClick={handleAvatarRemove}
+                  disabled={avatarUploading}
+                  className="inline-flex items-center gap-1 text-xs text-red-600 hover:text-red-700 font-medium"
+                >
+                  <Trash2 className="w-3 h-3" />
+                  Remove
+                </button>
+              )}
+            </div>
+            {avatarError && (
+              <p className="text-xs text-red-600 mt-1">{avatarError}</p>
+            )}
           </div>
         </div>
 

@@ -125,13 +125,19 @@ export default async function HomePage() {
 
           <div className="mt-6 flex flex-wrap justify-center gap-2 text-sm text-blue-200">
             <span>Popular:</span>
-            {["Phones", "Cars", "Rentals", "Jobs", "Furniture"].map((term) => (
+            {[
+              { label: "Phones", href: "/search?subcategory=electronics-phones" },
+              { label: "Cars", href: "/search?subcategory=vehicles-cars" },
+              { label: "Rentals", href: "/search?subcategory=property-rentals" },
+              { label: "Jobs", href: "/search?category=jobs" },
+              { label: "Furniture", href: "/search?category=furniture" },
+            ].map((item) => (
               <Link
-                key={term}
-                href={`/search?q=${encodeURIComponent(term)}`}
+                key={item.label}
+                href={item.href}
                 className="underline underline-offset-2 hover:text-white transition"
               >
-                {term}
+                {item.label}
               </Link>
             ))}
           </div>

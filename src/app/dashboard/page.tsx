@@ -132,7 +132,7 @@ export default async function DashboardPage() {
           </div>
         </Link>
         <Link
-          href="/api/payments/history"
+          href="/dashboard/payments"
           className="flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-xl hover:border-orange-300 hover:bg-orange-50 transition"
         >
           <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">

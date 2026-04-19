@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import {
   Copy,
   Check,
@@ -14,6 +13,7 @@ import {
   Rocket,
   Share2,
 } from "lucide-react";
+import DashboardAuthPrompt from "@/components/DashboardAuthPrompt";
 
 interface ReferredUser {
   name: string;
@@ -59,9 +59,9 @@ const REWARD_TIERS = [
 ];
 
 export default function ReferralDashboardPage() {
-  const router = useRouter();
   const [data, setData] = useState<ReferralData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [needsAuth, setNeedsAuth] = useState(false);
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
@@ -69,19 +69,19 @@ export default function ReferralDashboardPage() {
       try {
         const res = await fetch("/api/referrals");
         if (res.status === 401) {
-          router.push("/");
+          setNeedsAuth(true);
           return;
         }
         const json = await res.json();
         setData(json);
       } catch {
-        router.push("/");
+        setNeedsAuth(true);
       } finally {
         setLoading(false);
       }
     }
     fetchData();
-  }, [router]);
+  }, []);
 
   async function copyLink() {
     if (!data) return;
@@ -111,6 +111,10 @@ export default function ReferralDashboardPage() {
       `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(data.referralLink)}`,
       "_blank"
     );
+  }
+
+  if (needsAuth) {
+    return <DashboardAuthPrompt />;
   }
 
   if (loading) {

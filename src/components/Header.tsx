@@ -26,15 +26,25 @@ export default function Header() {
   const userMenuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    fetch("/api/auth/me")
+    fetch("/api/auth/me", { cache: "no-store" })
       .then((r) => (r.ok ? r.json() : null))
       .then((data) => {
-        if (!data) return;
+        if (!data) {
+          // Not authenticated - clear any stale state from the store
+          setUser(null);
+          return;
+        }
         // Handle both { user: {...} } and direct user object shapes
         const u = data.user && typeof data.user === "object" ? data.user : data;
-        if (u && u.id) setUser(u);
+        if (u && u.id) {
+          setUser(u);
+        } else {
+          setUser(null);
+        }
       })
-      .catch(() => {});
+      .catch(() => {
+        setUser(null);
+      });
   }, [setUser]);
 
   useEffect(() => {
@@ -51,9 +61,18 @@ export default function Header() {
   }, []);
 
   async function handleLogout() {
-    await fetch("/api/auth/logout", { method: "POST" });
+    try {
+      await fetch("/api/auth/logout", { method: "POST" });
+    } catch {
+      // ignore
+    }
     setUser(null);
     setUserMenuOpen(false);
+    // Hard reload to ensure any server-rendered content is refreshed
+    // with the logged-out state (removes name from header, etc.)
+    if (typeof window !== "undefined") {
+      window.location.href = "/";
+    }
   }
 
   function handleSearch(e: React.FormEvent) {

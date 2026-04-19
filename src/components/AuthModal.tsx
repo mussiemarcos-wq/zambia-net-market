@@ -2,13 +2,15 @@
 
 import { useState } from "react";
 import { useAppStore } from "@/lib/store";
-import { X } from "lucide-react";
+import { X, Eye, EyeOff } from "lucide-react";
 
 export default function AuthModal() {
   const { isAuthModalOpen, authModalTab, closeAuthModal, setUser, openAuthModal } =
     useAppStore();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [showLoginPassword, setShowLoginPassword] = useState(false);
+  const [showRegisterPassword, setShowRegisterPassword] = useState(false);
 
   const [loginForm, setLoginForm] = useState({ phone: "+260", password: "" });
   const [registerForm, setRegisterForm] = useState({
@@ -136,13 +138,23 @@ export default function AuthModal() {
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Password
                 </label>
-                <input
-                  type="password"
-                  required
-                  value={loginForm.password}
-                  onChange={(e) => setLoginForm({ ...loginForm, password: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-                />
+                <div className="relative">
+                  <input
+                    type={showLoginPassword ? "text" : "password"}
+                    required
+                    value={loginForm.password}
+                    onChange={(e) => setLoginForm({ ...loginForm, password: e.target.value })}
+                    className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowLoginPassword((v) => !v)}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-gray-600"
+                    aria-label={showLoginPassword ? "Hide password" : "Show password"}
+                  >
+                    {showLoginPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
               </div>
               <button
                 type="submit"
@@ -185,16 +197,27 @@ export default function AuthModal() {
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Password *
                 </label>
-                <input
-                  type="password"
-                  required
-                  minLength={6}
-                  value={registerForm.password}
-                  onChange={(e) =>
-                    setRegisterForm({ ...registerForm, password: e.target.value })
-                  }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-                />
+                <div className="relative">
+                  <input
+                    type={showRegisterPassword ? "text" : "password"}
+                    required
+                    minLength={6}
+                    value={registerForm.password}
+                    onChange={(e) =>
+                      setRegisterForm({ ...registerForm, password: e.target.value })
+                    }
+                    className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowRegisterPassword((v) => !v)}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-gray-600"
+                    aria-label={showRegisterPassword ? "Hide password" : "Show password"}
+                  >
+                    {showRegisterPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+                <p className="text-xs text-gray-500 mt-1">Minimum 6 characters</p>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
