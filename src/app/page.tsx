@@ -152,8 +152,8 @@ const TRUST_FEATURES = [
   },
   {
     icon: Sparkles,
-    title: "Free to Use",
-    description: "Post listings for free. Only pay if you want extra visibility or boosts.",
+    title: "Pay Only for Growth",
+    description: "Post 3 listings free. Upgrade with boosts, featured placement or business plans when you're ready to scale.",
     color: "text-purple-600 bg-purple-50",
   },
 ];
@@ -528,8 +528,8 @@ export default async function HomePage() {
               </div>
               <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-5 border border-white/10">
                 <Heart className="w-8 h-8 text-yellow-300 mb-3" />
-                <p className="text-sm text-blue-100">Free to Use</p>
-                <p className="text-2xl font-bold">No Fees</p>
+                <p className="text-sm text-blue-100">Pay Only for Growth</p>
+                <p className="text-2xl font-bold">3 Free Ads</p>
               </div>
               <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-5 border border-white/10 translate-y-6">
                 <ShieldCheck className="w-8 h-8 text-yellow-300 mb-3" />
