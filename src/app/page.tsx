@@ -197,8 +197,9 @@ export default async function HomePage() {
             </span>
           </h1>
           <p className="mt-6 text-lg md:text-xl text-blue-100 max-w-2xl mx-auto leading-relaxed">
-            Post ads for free, find great deals, and connect with buyers and
-            sellers in your area. No middlemen, no fees — just trusted local commerce.
+            Post up to 3 ads free, find great deals, and connect directly with
+            buyers and sellers in your area. No middlemen, no commissions —
+            just trusted local commerce.
           </p>
 
           {/* Search Bar */}
