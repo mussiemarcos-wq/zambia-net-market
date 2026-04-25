@@ -7,6 +7,7 @@ import Footer from "@/components/Footer";
 import AuthModal from "@/components/AuthModal";
 import InstallPrompt from "@/components/InstallPrompt";
 import OnboardingTour from "@/components/OnboardingTour";
+import VerifyPhoneBanner from "@/components/VerifyPhoneBanner";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -48,6 +49,7 @@ export default function RootLayout({
       </head>
       <body className={`${inter.className} min-h-full flex flex-col bg-gray-50 dark:bg-gray-900 dark:text-gray-100`}>
         <Header />
+        <VerifyPhoneBanner />
         <main className="flex-1">{children}</main>
         <Footer />
         <AuthModal />

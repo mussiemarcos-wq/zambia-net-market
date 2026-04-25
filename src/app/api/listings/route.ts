@@ -164,6 +164,14 @@ export async function POST(request: NextRequest) {
     const user = await getCurrentUser();
     if (!user) return unauthorized();
 
+    // Phone verification required to post listings (anti-spam measure)
+    if (!user.isPhoneVerified && user.role !== "ADMIN" && user.role !== "SUPER_ADMIN") {
+      return error(
+        "Please verify your phone number before posting a listing.",
+        403
+      );
+    }
+
     const body = await request.json();
     const { title, description, price, priceType, categoryId, subcategoryId, condition, location, latitude, longitude } = body;
 

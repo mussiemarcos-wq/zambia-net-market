@@ -21,6 +21,7 @@ interface ListingActionsProps {
   listingPrice: string | number | null;
   isFavourited?: boolean;
   categorySlug?: string;
+  sellerVerified?: boolean;
 }
 
 const REPORT_REASONS = [
@@ -39,6 +40,7 @@ export default function ListingActions({
   listingPrice,
   isFavourited: initialFav = false,
   categorySlug,
+  sellerVerified = true,
 }: ListingActionsProps) {
   const { user, openAuthModal } = useAppStore();
   const [isFav, setIsFav] = useState(initialFav);
@@ -166,29 +168,39 @@ export default function ListingActions({
 
   return (
     <div className="space-y-3">
-      {/* Contact buttons - use <a> so native browser handles universal links on iOS */}
-      <div className="flex gap-2">
-        <a
-          href={whatsappUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          onClick={trackWhatsAppClick}
-          className="flex-1 flex items-center justify-center gap-2 bg-green-500 hover:bg-green-600 text-white font-semibold py-3.5 px-4 rounded-xl transition-colors"
-        >
-          <MessageCircle className="w-5 h-5" />
-          WhatsApp
-        </a>
-        <a
-          href={telegramUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          onClick={trackTelegramClick}
-          className="flex-1 flex items-center justify-center gap-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3.5 px-4 rounded-xl transition-colors"
-        >
-          <Send className="w-5 h-5" />
-          Telegram
-        </a>
-      </div>
+      {/* Contact buttons - hidden if seller is not phone-verified (anti-spam) */}
+      {sellerVerified ? (
+        <div className="flex gap-2">
+          <a
+            href={whatsappUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={trackWhatsAppClick}
+            className="flex-1 flex items-center justify-center gap-2 bg-green-500 hover:bg-green-600 text-white font-semibold py-3.5 px-4 rounded-xl transition-colors"
+          >
+            <MessageCircle className="w-5 h-5" />
+            WhatsApp
+          </a>
+          <a
+            href={telegramUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={trackTelegramClick}
+            className="flex-1 flex items-center justify-center gap-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3.5 px-4 rounded-xl transition-colors"
+          >
+            <Send className="w-5 h-5" />
+            Telegram
+          </a>
+        </div>
+      ) : (
+        <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 rounded-xl p-4 text-sm">
+          <p className="font-semibold mb-1">⚠ Seller not verified</p>
+          <p className="text-xs">
+            This seller has not yet verified their phone number. Contact details
+            are hidden until they verify.
+          </p>
+        </div>
+      )}
 
       {/* Favourite and Share row */}
       <div className="flex gap-2">

@@ -88,6 +88,7 @@ export default async function ListingDetailPage({ params }: PageProps) {
           name: true,
           phone: true,
           isVerified: true,
+          isPhoneVerified: true,
           avatarUrl: true,
           location: true,
           createdAt: true,
@@ -383,6 +384,7 @@ export default async function ListingDetailPage({ params }: PageProps) {
                 listingTitle={listing.title}
                 listingPrice={listing.price as unknown as string | number | null}
                 categorySlug={listing.category.slug}
+                sellerVerified={listing.user.isPhoneVerified ?? false}
               />
             </div>
 

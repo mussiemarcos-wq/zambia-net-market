@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useAppStore } from "@/lib/store";
 import { X, Eye, EyeOff } from "lucide-react";
+import PhoneVerifyModal from "@/components/PhoneVerifyModal";
 
 export default function AuthModal() {
   const { isAuthModalOpen, authModalTab, closeAuthModal, setUser, openAuthModal } =
@@ -11,6 +12,8 @@ export default function AuthModal() {
   const [error, setError] = useState("");
   const [showLoginPassword, setShowLoginPassword] = useState(false);
   const [showRegisterPassword, setShowRegisterPassword] = useState(false);
+  const [verifyPhone, setVerifyPhone] = useState<string | null>(null);
+  const [autoSentOtp, setAutoSentOtp] = useState(false);
 
   const [loginForm, setLoginForm] = useState({ phone: "+260", password: "" });
   const [registerForm, setRegisterForm] = useState({
@@ -21,7 +24,8 @@ export default function AuthModal() {
     location: "",
   });
 
-  if (!isAuthModalOpen) return null;
+  // Don't return null here - we need PhoneVerifyModal to keep rendering
+  // even after the auth modal closes (e.g. after registration triggers OTP).
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
@@ -38,7 +42,13 @@ export default function AuthModal() {
       // Handle both {user: {...}} and direct user object shapes
       const u = data.user && typeof data.user === "object" ? data.user : data;
       setUser(u);
-      closeAuthModal();
+      // If user hasn't verified their phone yet, show the OTP modal
+      if (u && u.isPhoneVerified === false) {
+        setVerifyPhone(u.phone);
+        setAutoSentOtp(false);
+      } else {
+        closeAuthModal();
+      }
       setLoginForm({ phone: "", password: "" });
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Login failed");
@@ -76,8 +86,10 @@ export default function AuthModal() {
       // Handle both {user: {...}} and direct user object shapes
       const u = data.user && typeof data.user === "object" ? data.user : data;
       setUser(u);
-      closeAuthModal();
-      setRegisterForm({ name: "", phone: "", password: "", email: "", location: "" });
+      // After registration, OTP was auto-sent. Show verification modal.
+      setVerifyPhone(u.phone);
+      setAutoSentOtp(true);
+      setRegisterForm({ name: "", phone: "+260", password: "", email: "", location: "" });
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Registration failed");
     } finally {
@@ -86,6 +98,8 @@ export default function AuthModal() {
   }
 
   return (
+    <>
+    {isAuthModalOpen && (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between p-4 border-b border-gray-200">
@@ -262,5 +276,34 @@ export default function AuthModal() {
         </div>
       </div>
     </div>
+    )}
+
+    {/* Phone verification modal - shown after registration or login if unverified */}
+    <PhoneVerifyModal
+      phone={verifyPhone || ""}
+      isOpen={!!verifyPhone}
+      autoSent={autoSentOtp}
+      onClose={() => {
+        setVerifyPhone(null);
+        setAutoSentOtp(false);
+      }}
+      onVerified={async () => {
+        // Refresh user data to pick up isPhoneVerified=true
+        try {
+          const res = await fetch("/api/auth/me");
+          if (res.ok) {
+            const data = await res.json();
+            const u = data.user && typeof data.user === "object" ? data.user : data;
+            setUser(u);
+          }
+        } catch {
+          // ignore
+        }
+        setVerifyPhone(null);
+        setAutoSentOtp(false);
+        closeAuthModal();
+      }}
+    />
+    </>
   );
 }

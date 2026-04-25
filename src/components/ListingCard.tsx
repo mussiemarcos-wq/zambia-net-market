@@ -25,6 +25,7 @@ interface ListingCardProps {
       id: string;
       name: string;
       isVerified: boolean;
+      isPhoneVerified?: boolean;
       avatarUrl: string | null;
     };
     category: { name: string };
@@ -162,7 +163,28 @@ export default function ListingCard({
               {listing.user.name}
             </span>
             {listing.user.isVerified && (
-              <BadgeCheck className="w-3.5 h-3.5 text-blue-500 flex-shrink-0" />
+              <BadgeCheck
+                className="w-3.5 h-3.5 text-blue-500 flex-shrink-0"
+                aria-label="Verified seller"
+              />
+            )}
+            {listing.user.isPhoneVerified && !listing.user.isVerified && (
+              <span
+                title="Phone verified"
+                className="w-3.5 h-3.5 flex items-center justify-center bg-green-500 rounded-full flex-shrink-0"
+              >
+                <svg
+                  className="w-2 h-2 text-white"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M16.7 5.3a1 1 0 010 1.4l-7.3 7.3a1 1 0 01-1.4 0L3.3 9.3a1 1 0 011.4-1.4L8.7 11.9l6.6-6.6a1 1 0 011.4 0z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              </span>
             )}
           </div>
         </div>

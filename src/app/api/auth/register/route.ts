@@ -118,6 +118,27 @@ export async function POST(request: NextRequest) {
       maxAge: 60 * 60 * 24 * 7, // 7 days
     });
 
+    // Fire-and-forget: send WhatsApp OTP (non-blocking so registration completes
+    // even if WhatsApp API is slow). The frontend will redirect to /verify-phone.
+    try {
+      const { generateOtpCode, hashOtpCode, normalisePhone, sendWhatsAppOtp } =
+        await import("@/lib/whatsapp-otp");
+      const cleanPhone = normalisePhone(user.phone);
+      const code = generateOtpCode();
+      const codeHash = hashOtpCode(code, cleanPhone);
+      const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
+      await prisma.phoneVerification.create({
+        data: { phone: cleanPhone, codeHash, expiresAt },
+      });
+      // Don't await — let it complete in background
+      sendWhatsAppOtp(cleanPhone, code).catch((err) => {
+        console.error("Auto-OTP send failed:", err);
+      });
+    } catch (otpErr) {
+      console.error("Auto-OTP error:", otpErr);
+      // Registration still succeeds — user can request OTP manually
+    }
+
     return success(user, 201);
   } catch (err) {
     console.error("Registration error:", err);

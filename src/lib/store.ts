@@ -7,6 +7,7 @@ interface User {
   email: string | null;
   role: string;
   isVerified: boolean;
+  isPhoneVerified?: boolean;
   avatarUrl: string | null;
   location: string | null;
 }

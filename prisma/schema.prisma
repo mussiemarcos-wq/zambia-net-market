@@ -79,6 +79,8 @@ model User {
   isVerified    Boolean   @default(false) @map("is_verified")
   location      String?
   isBanned      Boolean   @default(false) @map("is_banned")
+  isPhoneVerified Boolean @default(false) @map("is_phone_verified")
+  phoneVerifiedAt DateTime? @map("phone_verified_at")
   referralCode  String?   @unique @map("referral_code")
   referredBy    String?   @map("referred_by")
   referralCount Int       @default(0) @map("referral_count")
@@ -360,4 +362,19 @@ model SavedSearch {
 
   @@index([userId, isActive])
   @@map("saved_searches")
+}
+
+model PhoneVerification {
+  id          String    @id @default(uuid())
+  phone       String
+  codeHash    String    @map("code_hash")
+  expiresAt   DateTime  @map("expires_at")
+  attempts    Int       @default(0)
+  verifiedAt  DateTime? @map("verified_at")
+  ipHash      String?   @map("ip_hash")
+  createdAt   DateTime  @default(now()) @map("created_at")
+
+  @@index([phone, createdAt(sort: Desc)])
+  @@index([expiresAt])
+  @@map("phone_verifications")
 }
